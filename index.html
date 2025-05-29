@@ -1,31 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vocabulary Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vocabulary Quiz - ALC Course</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f0f0f0; }
-    .quiz-container { background: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .question { font-size: 20px; margin-bottom: 10px; }
-    .choices button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 5px; background: #eee; cursor: pointer; transition: background 0.3s; }
-    .choices button:hover { background: #ddd; }
-    .correct { background: #c8e6c9 !important; }
-    .wrong { background: #ffcdd2 !important; }
-    .controls { margin-top: 20px; display: flex; justify-content: space-between; }
-    #result { margin-top: 20px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f0f0f0;
+    }
+    .quiz-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .question {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .choices button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #eee;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .choices button:hover {
+      background: #ddd;
+    }
+    .correct {
+      background: #c8e6c9 !important;
+    }
+    .wrong {
+      background: #ffcdd2 !important;
+    }
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    #scoreDisplay {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .jump {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .jump input {
+      width: 100px;
+      padding: 5px;
+      margin-right: 5px;
+    }
   </style>
 </head>
 <body>
   <div class="quiz-container">
+    <!-- ALC Course Görseli -->
+    <img src="alc-course.png" alt="ALC Course" style="width:100%; max-width:300px; display:block; margin: 0 auto 20px auto; border-radius: 10px;" />
+
+    <!-- Soru ve cevaplar -->
     <div id="question" class="question"></div>
     <div id="choices" class="choices"></div>
+
+    <!-- Butonlar -->
     <div class="controls">
       <button id="startBtn">Teste Başla</button>
       <button id="nextBtn" style="display:none;">Sonraki</button>
       <button id="finishBtn" style="display:none;">Bitir</button>
     </div>
+
+    <!-- Doğru / Yanlış Sayacı -->
+    <div id="scoreDisplay">Doğru: 0 | Yanlış: 0</div>
+
+    <!-- Sonuç -->
     <div id="result"></div>
+
+    <!-- Soru numarasına gitme -->
+    <div class="jump">
+      <input type="number" id="jumpTo" placeholder="Soru no gir" min="1" />
+      <button onclick="jumpToQuestion()">Git</button>
+    </div>
   </div>
 
   <script>
@@ -40,6 +106,7 @@
     const startBtn = document.getElementById("startBtn");
     const finishBtn = document.getElementById("finishBtn");
     const resultEl = document.getElementById("result");
+    const scoreDisplay = document.getElementById("scoreDisplay");
 
     startBtn.onclick = () => {
       fetch('quiz-data.json')
@@ -57,7 +124,7 @@
 
     function showQuestion() {
       const q = quiz[current];
-      questionEl.textContent = `(${current + 1}/${total}) What is the meaning of "${q.word}"?`;
+      questionEl.textContent = `(${current + 1}/${total}) "${q.word}" kelimesinin anlamı nedir?`;
       choicesEl.innerHTML = "";
       q.choices.forEach(choice => {
         const btn = document.createElement("button");
@@ -75,6 +142,7 @@
         else if (btn === button) btn.classList.add("wrong");
       });
       if (isCorrect) score++;
+      scoreDisplay.textContent = `Doğru: ${score} | Yanlış: ${current + 1 - score}`;
       nextBtn.style.display = current < total - 1 ? "inline" : "none";
     }
 
@@ -92,6 +160,16 @@
       finishBtn.style.display = "none";
       resultEl.innerHTML = `<h2>Test Bitti!</h2><p>Doğru: ${score} / ${total}</p><p>Yanlış: ${total - score}</p>`;
     };
+
+    function jumpToQuestion() {
+      const num = parseInt(document.getElementById("jumpTo").value, 10);
+      if (!isNaN(num) && num >= 1 && num <= total) {
+        current = num - 1;
+        showQuestion();
+      } else {
+        alert("Geçersiz soru numarası!");
+      }
+    }
   </script>
 </body>
 </html>
