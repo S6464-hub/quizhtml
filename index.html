@@ -259,4 +259,41 @@
       Array.from(choicesEl.children).forEach(btn => {
         btn.disabled = true;
         if (btn.textContent === quiz[current].answer) btn.classList.add("correct");
-        else if (btn
+        else if (btn === button) btn.classList.add("wrong");
+      });
+
+      updateScoreDisplay();
+    }
+
+    function updateScoreDisplay() {
+      let wrongCount = total - score - answered.filter(a => a === null).length;
+      if (wrongCount < 0) wrongCount = 0;
+      scoreDisplay.textContent = `Doğru: ${score} | Yanlış: ${wrongCount}`;
+    }
+
+    nextBtn.onclick = () => {
+      if (current < total - 1) {
+        current++;
+        showQuestion();
+      }
+    };
+    prevBtn.onclick = () => {
+      if (current > 0) {
+        current--;
+        showQuestion();
+      }
+    };
+    finishBtn.onclick = () => {
+      if (answered.includes(null)) {
+        if (!confirm("Bazı soruları cevaplamadınız, yine de bitirmek istiyor musunuz?")) return;
+      }
+      questionEl.style.display = "none";
+      choicesEl.style.display = "none";
+      document.querySelector(".controls").style.display = "none";
+      scoreDisplay.style.display = "none";
+
+      resultEl.innerHTML = `Test tamamlandı!<br>Doğru: ${score}<br>Yanlış: ${total - score}`;
+    };
+  </script>
+</body>
+</html>
