@@ -45,8 +45,8 @@
     .controls {
       margin-top: 20px;
       display: flex;
-      justify-content: space-between;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 10px;
     }
     #scoreDisplay {
@@ -77,7 +77,8 @@
     <!-- Butonlar -->
     <div class="controls">
       <button id="startBtn">Teste Başla</button>
-      <button id="nextBtn" style="display:none;">Sonraki</button>
+      <button id="prevBtn" style="display:none;">Geri</button>
+      <button id="nextBtn" style="display:none;">İleri</button>
       <button id="finishBtn" style="display:none;">Bitir</button>
     </div>
 
@@ -99,11 +100,13 @@
     let current = 0;
     let score = 0;
     let total = 0;
+    let answered = [];
 
     const questionEl = document.getElementById("question");
     const choicesEl = document.getElementById("choices");
-    const nextBtn = document.getElementById("nextBtn");
     const startBtn = document.getElementById("startBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
     const finishBtn = document.getElementById("finishBtn");
     const resultEl = document.getElementById("result");
     const scoreDisplay = document.getElementById("scoreDisplay");
@@ -116,8 +119,11 @@
           current = 0;
           score = 0;
           total = quiz.length;
+          answered = new Array(total).fill(null);
           startBtn.style.display = "none";
           finishBtn.style.display = "block";
+          nextBtn.style.display = "inline";
+          prevBtn.style.display = "none";
           showQuestion();
         });
     };
@@ -130,25 +136,47 @@
         const btn = document.createElement("button");
         btn.textContent = choice;
         btn.onclick = () => selectAnswer(btn, choice === q.answer);
+        if (answered[current] !== null) btn.disabled = true;
         choicesEl.appendChild(btn);
       });
-      nextBtn.style.display = "none";
+
+      prevBtn.style.display = current > 0 ? "inline" : "none";
+      nextBtn.style.display = current < total - 1 ? "inline" : "none";
+
+      updateScoreDisplay();
     }
 
     function selectAnswer(button, isCorrect) {
+      if (answered[current] !== null) return;
+
+      answered[current] = isCorrect ? "correct" : "wrong";
+      if (isCorrect) score++;
+
       Array.from(choicesEl.children).forEach(btn => {
         btn.disabled = true;
         if (btn.textContent === quiz[current].answer) btn.classList.add("correct");
         else if (btn === button) btn.classList.add("wrong");
       });
-      if (isCorrect) score++;
-      scoreDisplay.textContent = `Doğru: ${score} | Yanlış: ${current + 1 - score}`;
-      nextBtn.style.display = current < total - 1 ? "inline" : "none";
+
+      updateScoreDisplay();
+    }
+
+    function updateScoreDisplay() {
+      const totalAnswered = answered.filter(a => a !== null).length;
+      const totalWrong = totalAnswered - score;
+      scoreDisplay.textContent = `Doğru: ${score} | Yanlış: ${totalWrong}`;
     }
 
     nextBtn.onclick = () => {
-      current++;
-      if (current < total) {
+      if (current < total - 1) {
+        current++;
+        showQuestion();
+      }
+    };
+
+    prevBtn.onclick = () => {
+      if (current > 0) {
+        current--;
         showQuestion();
       }
     };
@@ -157,8 +185,9 @@
       questionEl.style.display = "none";
       choicesEl.style.display = "none";
       nextBtn.style.display = "none";
+      prevBtn.style.display = "none";
       finishBtn.style.display = "none";
-      resultEl.innerHTML = `<h2>Test Bitti!</h2><p>Doğru: ${score} / ${total}</p><p>Yanlış: ${total - score}</p>`;
+      resultEl.innerHTML = `<h2>Test Bitti!</h2><p>Doğru: ${score} / ${total}</p><p>Yanlış: ${answered.filter(a => a !== null).length - score}</p>`;
     };
 
     function jumpToQuestion() {
