@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vocabulary Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f0f0f0; }
+    .quiz-container { background: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .question { font-size: 20px; margin-bottom: 10px; }
+    .choices button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 5px; background: #eee; cursor: pointer; transition: background 0.3s; }
+    .choices button:hover { background: #ddd; }
+    .correct { background: #c8e6c9 !important; }
+    .wrong { background: #ffcdd2 !important; }
+    .controls { margin-top: 20px; display: flex; justify-content: space-between; }
+    #result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div id="question" class="question"></div>
+    <div id="choices" class="choices"></div>
+    <div class="controls">
+      <button id="startBtn">Teste Başla</button>
+      <button id="nextBtn" style="display:none;">Sonraki</button>
+      <button id="finishBtn" style="display:none;">Bitir</button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    let quiz = [];
+    let current = 0;
+    let score = 0;
+    let total = 0;
+
+    const questionEl = document.getElementById("question");
+    const choicesEl = document.getElementById("choices");
+    const nextBtn = document.getElementById("nextBtn");
+    const startBtn = document.getElementById("startBtn");
+    const finishBtn = document.getElementById("finishBtn");
+    const resultEl = document.getElementById("result");
+
+    startBtn.onclick = () => {
+      fetch('quiz-data.json')
+        .then(response => response.json())
+        .then(data => {
+          quiz = data;
+          current = 0;
+          score = 0;
+          total = quiz.length;
+          startBtn.style.display = "none";
+          finishBtn.style.display = "block";
+          showQuestion();
+        });
+    };
+
+    function showQuestion() {
+      const q = quiz[current];
+      questionEl.textContent = `(${current + 1}/${total}) What is the meaning of "${q.word}"?`;
+      choicesEl.innerHTML = "";
+      q.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+        btn.onclick = () => selectAnswer(btn, choice === q.answer);
+        choicesEl.appendChild(btn);
+      });
+      nextBtn.style.display = "none";
+    }
+
+    function selectAnswer(button, isCorrect) {
+      Array.from(choicesEl.children).forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === quiz[current].answer) btn.classList.add("correct");
+        else if (btn === button) btn.classList.add("wrong");
+      });
+      if (isCorrect) score++;
+      nextBtn.style.display = current < total - 1 ? "inline" : "none";
+    }
+
+    nextBtn.onclick = () => {
+      current++;
+      if (current < total) {
+        showQuestion();
+      }
+    };
+
+    finishBtn.onclick = () => {
+      questionEl.style.display = "none";
+      choicesEl.style.display = "none";
+      nextBtn.style.display = "none";
+      finishBtn.style.display = "none";
+      resultEl.innerHTML = `<h2>Test Bitti!</h2><p>Doğru: ${score} / ${total}</p><p>Yanlış: ${total - score}</p>`;
+    };
+  </script>
+</body>
+</html>
