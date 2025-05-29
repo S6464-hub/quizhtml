@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vocabulary Quiz - ALC Course</title>
   <style>
     body {
@@ -43,61 +43,77 @@
       background: #ffcdd2 !important;
     }
     .controls {
-      margin-top: 20px;
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
+      gap: 20px;
+      margin-top: 20px;
     }
-    #scoreDisplay {
-      margin-top: 15px;
-      font-weight: bold;
-      text-align: center;
-    }
-    /* input ve buton alanı */
-    .start-settings {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .start-settings input {
-      width: 80px;
-      padding: 8px;
+    #finishBtn {
+      display: block;
+      margin: 30px auto 0 auto;
+      padding: 10px 30px;
+      border-radius: 8px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      cursor: pointer;
       font-size: 16px;
-      margin-right: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      text-align: center;
+      width: 120px;
+    }
+    #finishBtn:hover {
+      background-color: #1976D2;
+    }
+    #prevBtn, #nextBtn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      background-color: #eee;
+      transition: background-color 0.3s;
+    }
+    #prevBtn:hover, #nextBtn:hover {
+      background-color: #ddd;
+    }
+    #difficultySelection button {
+      margin: 0 10px;
+      padding: 10px 25px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background-color: #2196F3;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    #difficultySelection button:hover {
+      background-color: #1976D2;
     }
   </style>
 </head>
 <body>
   <div class="quiz-container">
-
-    <!-- ALC Course Görseli -->
-    <img src="alc-course.png" alt="ALC Course" style="width:100%; max-width:300px; display:block; margin: 0 auto 20px auto; border-radius: 10px;" />
-
-    <!-- Test Ayarları: Kaç soru sorulsun? -->
-    <div class="start-settings">
-      <label for="questionCount">Kaç soru çözmek istiyorsunuz? </label>
-      <input type="number" id="questionCount" min="1" />
-      <button id="startBtn">Teste Başla</button>
+    <!-- Zorluk seçimi -->
+    <div id="difficultySelection" style="text-align:center; margin-bottom:20px;">
+      <h3>Test Zorluğunu Seçin</h3>
+      <button onclick="startQuiz('easy')">Kolay</button>
+      <button onclick="startQuiz('hard')">Zor</button>
     </div>
 
-    <!-- Soru ve cevaplar -->
+    <!-- Test alanı -->
+    <img src="alc-course.png" alt="ALC Course" style="width:100%; max-width:300px; display:block; margin: 0 auto 20px auto; border-radius: 10px;" />
+
     <div id="question" class="question" style="display:none;"></div>
     <div id="choices" class="choices" style="display:none;"></div>
 
-    <!-- Butonlar -->
     <div class="controls" style="display:none;">
-      <button id="prevBtn" disabled>Geri</button>
+      <button id="prevBtn">Geri</button>
       <button id="nextBtn">İleri</button>
-      <button id="finishBtn">Bitir</button>
     </div>
 
-    <!-- Doğru / Yanlış Sayacı -->
-    <div id="scoreDisplay" style="display:none;">Doğru: 0 | Yanlış: 0</div>
+    <button id="finishBtn" style="display:none;">Bitir</button>
 
-    <!-- Sonuç -->
+    <div id="scoreDisplay" style="display:none; margin-top: 15px; font-weight: bold; text-align: center;">Doğru: 0 | Yanlış: 0</div>
     <div id="result"></div>
   </div>
 
@@ -110,55 +126,38 @@
 
     const questionEl = document.getElementById("question");
     const choicesEl = document.getElementById("choices");
-    const startBtn = document.getElementById("startBtn");
-    const nextBtn = document.getElementById("nextBtn");
     const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
     const finishBtn = document.getElementById("finishBtn");
-    const resultEl = document.getElementById("result");
     const scoreDisplay = document.getElementById("scoreDisplay");
-    const questionCountInput = document.getElementById("questionCount");
-    const controlsDiv = document.querySelector(".controls");
-    const startSettingsDiv = document.querySelector(".start-settings");
+    const resultEl = document.getElementById("result");
+    const difficultySelection = document.getElementById("difficultySelection");
+    const controls = document.querySelector(".controls");
 
-    startBtn.onclick = () => {
-      fetch('quiz-data.json')
-        .then(response => response.json())
+    function startQuiz(level) {
+      const fileName = level === "hard" ? "quiz-data_hard.json" : "quiz-data.json";
+
+      fetch(fileName)
+        .then(res => res.json())
         .then(data => {
-          const maxQuestions = data.length;
-          let numQuestions = parseInt(questionCountInput.value, 10);
-
-          if (isNaN(numQuestions) || numQuestions < 1 || numQuestions > maxQuestions) {
-            alert(`Lütfen 1 ile ${maxQuestions} arasında geçerli bir sayı giriniz.`);
-            return;
-          }
-
-          // Soruları karıştır
-          let shuffled = data.slice();
-          for (let i = shuffled.length -1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-          }
-
-          quiz = shuffled.slice(0, numQuestions);
+          quiz = data;
           current = 0;
           score = 0;
           total = quiz.length;
           answered = new Array(total).fill(null);
 
-          // Arayüz ayarları
-          startSettingsDiv.style.display = "none";
+          difficultySelection.style.display = "none";
           questionEl.style.display = "block";
           choicesEl.style.display = "block";
-          controlsDiv.style.display = "flex";
+          controls.style.display = "flex";
+          finishBtn.style.display = "block";
           scoreDisplay.style.display = "block";
           resultEl.innerHTML = "";
 
-          prevBtn.disabled = true;  // ilk soru, geri pasif
-          nextBtn.disabled = false;
-
           showQuestion();
-        });
-    };
+        })
+        .catch(() => alert("Quiz dosyası yüklenirken hata oluştu!"));
+    }
 
     function showQuestion() {
       const q = quiz[current];
@@ -173,8 +172,8 @@
         choicesEl.appendChild(btn);
       });
 
-      prevBtn.disabled = current === 0;
-      nextBtn.disabled = current === total - 1;
+      prevBtn.style.display = current > 0 ? "inline-block" : "none";
+      nextBtn.style.display = current < total - 1 ? "inline-block" : "none";
 
       updateScoreDisplay();
     }
@@ -217,7 +216,8 @@
     finishBtn.onclick = () => {
       questionEl.style.display = "none";
       choicesEl.style.display = "none";
-      controlsDiv.style.display = "none";
+      controls.style.display = "none";
+      finishBtn.style.display = "none";
       scoreDisplay.style.display = "none";
       resultEl.innerHTML = `<h2>Test Bitti!</h2><p>Doğru: ${score} / ${total}</p><p>Yanlış: ${answered.filter(a => a !== null).length - score}</p>`;
     };
