@@ -157,6 +157,13 @@
       box-shadow: none;
     }
 
+    /* Bitir butonu */
+    #finishBtn {
+      margin: 20px auto 0;
+      display: block;
+      max-width: 120px;
+    }
+
     /* Skor */
     #scoreDisplay {
       margin-top: 15px;
@@ -207,7 +214,7 @@
 <body>
   <div class="quiz-container">
     <!-- Resim -->
-    <img id="alcImage" src="ALC-course.png" alt="ALC Course Logo" />
+    <img id="alcImage" src="alc-course.png" alt="ALC Course Logo" />
 
     <!-- Setup -->
     <div id="setup">
@@ -229,8 +236,9 @@
     <div class="controls" style="display:none;">
       <button id="prevBtn">Geri</button>
       <button id="nextBtn">İleri</button>
-      <button id="finishBtn">Bitir</button>
     </div>
+
+    <button id="finishBtn" style="display:none;">Bitir</button>
 
     <div id="scoreDisplay"></div>
     <div id="result"></div>
@@ -310,94 +318,89 @@
         choicesEl.style.display = "block";
         nextBtn.style.display = "inline-block";
         prevBtn.style.display = "inline-block";
-        finishBtn.style.display = "inline-block";
+        finishBtn.style.display = "block";
         document.querySelector(".controls").style.display = "flex";
-        resultEl.innerHTML = "";
-        scoreDisplay.style.display = "block";
-        updateScoreDisplay();
+        resultEl.textContent = "";
+        scoreDisplay.textContent = "";
 
         showQuestion();
+        updateButtons();
       });
   };
-
-  function getRandomQuestions(arr, n) {
-    const result = [];
-    const taken = new Set();
-    while(result.length < n) {
-      let idx = Math.floor(Math.random() * arr.length);
-      if (!taken.has(idx)) {
-        taken.add(idx);
-        result.push(arr[idx]);
-      }
-    }
-    return result;
-  }
-
-  function showQuestion() {
-    const q = quiz[current];
-    questionEl.textContent = `(${current + 1}/${total}) "${q.word}" kelimesinin anlamı nedir?`;
-    choicesEl.innerHTML = "";
-
-    q.choices.forEach(choice => {
-      const btn = document.createElement("button");
-      btn.textContent = choice;
-
-      if (answered[current] !== null) {
-        btn.disabled = true;
-        if (choice === q.answer) btn.classList.add("correct");
-        else if (answered[current] === "wrong" && choice === answered[current + "_wrongChoice"]) btn.classList.add("wrong");
-      }
-
-      btn.onclick = () => selectAnswer(btn, choice === q.answer);
-      choicesEl.appendChild(btn);
-    });
-  }
-
-  function selectAnswer(button, isCorrect) {
-    if (answered[current] !== null) return;
-
-    answered[current] = isCorrect ? "correct" : "wrong";
-    if (!isCorrect) answered[current + "_wrongChoice"] = button.textContent;
-    if (isCorrect) score++;
-
-    Array.from(choicesEl.children).forEach(btn => {
-      btn.disabled = true;
-      if (btn.textContent === quiz[current].answer) btn.classList.add("correct");
-      else if (btn === button) btn.classList.add("wrong");
-    });
-
-    updateScoreDisplay();
-  }
-
-  function updateScoreDisplay() {
-    let wrongCount = total - score - answered.filter(a => a === null).length;
-    if (wrongCount < 0) wrongCount = 0;
-    scoreDisplay.textContent = `Doğru: ${score} | Yanlış: ${wrongCount}`;
-  }
 
   nextBtn.onclick = () => {
     if (current < total - 1) {
       current++;
       showQuestion();
+      updateButtons();
     }
   };
   prevBtn.onclick = () => {
     if (current > 0) {
       current--;
       showQuestion();
+      updateButtons();
     }
   };
-  finishBtn.onclick = () => {
-    if (answered.includes(null)) {
-      if (!confirm("Bazı soruları cevaplamadınız, yine de bitirmek istiyor musunuz?")) return;
-    }
-    questionEl.style.display = "none";
-    choicesEl.style.display = "none";
-    document.querySelector(".controls").style.display = "none";
-    scoreDisplay.style.display = "none";
 
-    resultEl.innerHTML = `Test tamamlandı!<br>Doğru: ${score}<br>Yanlış: ${total - score}`;
+  finishBtn.onclick = () => {
+    let correctCount = 0;
+    for (let i = 0; i < total; i++) {
+      if (answered[i] === quiz[i].answer) {
+        correctCount++;
+      }
+    }
+    scoreDisplay.textContent = `Doğru sayısı: ${correctCount} / ${total}`;
+    resultEl.textContent = "Test tamamlandı! Tebrikler.";
+    // Test bitti, butonları pasifleştirelim
+    nextBtn.disabled = true;
+    prevBtn.disabled = true;
+    finishBtn.disabled = true;
+    choicesEl.querySelectorAll("button").forEach(b => b.disabled = true);
   };
+
+  function showQuestion() {
+    questionEl.textContent = `Soru ${current + 1}: "${quiz[current].word}" kelimesinin anlamı nedir?`;
+    choicesEl.innerHTML = "";
+    quiz[current].choices.forEach(choice => {
+      const btn = document.createElement("button");
+      btn.textContent = choice;
+      btn.onclick = () => {
+        answered[current] = choice;
+        updateScore();
+        showQuestion();  // yenile, böylece işaretli cevap kalır
+      };
+      // Daha önce cevaplanmışsa buton rengi göster
+      if (answered[current] !== null) {
+        if (choice === quiz[current].answer) {
+          btn.classList.add("correct");
+        }
+        if (choice === answered[current] && answered[current] !== quiz[current].answer) {
+          btn.classList.add("wrong");
+        }
+        btn.disabled = true;
+      }
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  function updateScore() {
+    let correctCount = 0;
+    for (let i = 0; i < total; i++) {
+      if (answered[i] === quiz[i].answer) correctCount++;
+    }
+    scoreDisplay.textContent = `Doğru sayısı: ${correctCount} / ${total}`;
+  }
+
+  function updateButtons() {
+    prevBtn.disabled = (current === 0);
+    nextBtn.disabled = (current === total - 1);
+  }
+
+  function getRandomQuestions(arr, num) {
+    const shuffled = arr.slice().sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, num);
+  }
 </script>
 </body>
 </html>
