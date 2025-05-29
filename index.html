@@ -75,6 +75,10 @@
     #prevBtn:hover, #nextBtn:hover {
       background-color: #ddd;
     }
+    #difficultySelection {
+      text-align: center;
+      margin-bottom: 20px;
+    }
     #difficultySelection button {
       margin: 0 10px;
       padding: 10px 25px;
@@ -89,19 +93,56 @@
     #difficultySelection button:hover {
       background-color: #1976D2;
     }
+    #questionCountInput {
+      margin-top: 15px;
+      font-size: 16px;
+      padding: 7px;
+      width: 120px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #startBtn {
+      margin-top: 15px;
+      padding: 10px 30px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    #startBtn:hover {
+      background-color: #388E3C;
+    }
+    #difficultyChosen {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
   <div class="quiz-container">
+
     <!-- Zorluk seçimi -->
-    <div id="difficultySelection" style="text-align:center; margin-bottom:20px;">
+    <div id="difficultySelection">
       <h3>Test Zorluğunu Seçin</h3>
-      <button onclick="startQuiz('easy')">Kolay</button>
-      <button onclick="startQuiz('hard')">Zor</button>
+      <button onclick="chooseDifficulty('easy')">Kolay</button>
+      <button onclick="chooseDifficulty('hard')">Zor</button>
+      <div id="difficultyChosen"></div>
+
+      <div style="margin-top: 20px;">
+        <label for="questionCountInput">Kaç soru çözmek istiyorsunuz?</label><br />
+        <input type="number" id="questionCountInput" min="1" max="100" value="10" />
+      </div>
+
+      <button id="startBtn" onclick="startQuiz()">Teste Başla</button>
     </div>
 
     <!-- Test alanı -->
-    <img src="alc-course.png" alt="ALC Course" style="width:100%; max-width:300px; display:block; margin: 0 auto 20px auto; border-radius: 10px;" />
+    <img src="alc-course.png" alt="ALC Course" style="width:100%; max-width:300px; display:none; margin: 0 auto 20px auto; border-radius: 10px;" id="quizImage" />
 
     <div id="question" class="question" style="display:none;"></div>
     <div id="choices" class="choices" style="display:none;"></div>
@@ -123,6 +164,7 @@
     let score = 0;
     let total = 0;
     let answered = [];
+    let difficulty = null;
 
     const questionEl = document.getElementById("question");
     const choicesEl = document.getElementById("choices");
@@ -133,20 +175,48 @@
     const resultEl = document.getElementById("result");
     const difficultySelection = document.getElementById("difficultySelection");
     const controls = document.querySelector(".controls");
+    const difficultyChosen = document.getElementById("difficultyChosen");
+    const quizImage = document.getElementById("quizImage");
+    const questionCountInput = document.getElementById("questionCountInput");
+    const startBtn = document.getElementById("startBtn");
 
-    function startQuiz(level) {
-      const fileName = level === "hard" ? "quiz-data_hard.json" : "quiz-data.json";
+    function chooseDifficulty(level) {
+      difficulty = level;
+      difficultyChosen.textContent = `Seçilen Zorluk: ${level === "easy" ? "Kolay" : "Zor"}`;
+    }
+
+    function startQuiz() {
+      if (!difficulty) {
+        alert("Lütfen önce zorluk seviyesini seçin!");
+        return;
+      }
+
+      let count = parseInt(questionCountInput.value, 10);
+      if (isNaN(count) || count < 1) {
+        alert("Lütfen geçerli bir soru sayısı girin!");
+        return;
+      }
+
+      const fileName = difficulty === "hard" ? "quiz-data_hard.json" : "quiz-data.json";
 
       fetch(fileName)
         .then(res => res.json())
         .then(data => {
-          quiz = data;
+          if (count > data.length) {
+            alert(`Maksimum soru sayısı ${data.length} olabilir. Otomatik olarak maksimuma ayarlandı.`);
+            count = data.length;
+          }
+
+          // Random soruları seç
+          quiz = shuffleArray(data).slice(0, count);
           current = 0;
           score = 0;
           total = quiz.length;
           answered = new Array(total).fill(null);
 
+          // UI ayarları
           difficultySelection.style.display = "none";
+          quizImage.style.display = "block";
           questionEl.style.display = "block";
           choicesEl.style.display = "block";
           controls.style.display = "flex";
@@ -157,6 +227,14 @@
           showQuestion();
         })
         .catch(() => alert("Quiz dosyası yüklenirken hata oluştu!"));
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
     }
 
     function showQuestion() {
