@@ -8,292 +8,396 @@
     body {
       font-family: Arial, sans-serif;
       margin: 40px;
-      background-color: #f0f0f0;
+      background-color: #f9f9f9;
     }
     .quiz-container {
       background: white;
-      padding: 20px;
+      padding: 20px 30px 50px;
       border-radius: 10px;
       max-width: 600px;
       margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      position: relative;
     }
-    .question {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-    .choices button {
+
+    /* Resim başta */
+    #alcImage {
       display: block;
-      width: 100%;
-      margin: 5px 0;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      background: #eee;
-      cursor: pointer;
-      transition: background 0.3s;
+      margin: 0 auto 25px;
+      max-width: 180px;
     }
-    .choices button:hover {
-      background: #ddd;
-    }
-    .correct {
-      background: #c8e6c9 !important;
-    }
-    .wrong {
-      background: #ffcdd2 !important;
-    }
-    .controls {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    #scoreDisplay {
-      margin-top: 15px;
-      font-weight: bold;
-      text-align: center;
-    }
-    /* Giriş seçimleri */
+
+    /* Setup */
     #setup {
-      margin-bottom: 30px;
       text-align: center;
+      margin-bottom: 35px;
+    }
+    #numQuestions {
+      width: 80px;
+      padding: 6px 10px;
       font-size: 16px;
-      gap: 12px;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      align-items: center;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      margin-left: 10px;
+      margin-right: 25px;
+      vertical-align: middle;
     }
-    #setup > * {
-      margin: 5px;
+    label {
+      font-weight: 600;
+      font-size: 16px;
+      vertical-align: middle;
     }
+
+    /* Kolay / zor butonlar */
+    .difficulty-buttons {
+      display: inline-block;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    .difficulty-buttons button {
+      background-color: #ddd;
+      border: none;
+      border-radius: 25px;
+      padding: 8px 20px;
+      margin: 0 6px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      color: #444;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .difficulty-buttons button.selected {
+      background-color: #1976d2;
+      color: white;
+      box-shadow: 0 4px 10px rgba(25,118,210,0.4);
+    }
+    .difficulty-buttons button:hover:not(.selected) {
+      background-color: #bbb;
+    }
+
     #startBtn {
-      padding: 10px 20px;
+      padding: 10px 30px;
+      font-weight: 700;
+      font-size: 17px;
+      color: white;
       background-color: #1976d2;
       border: none;
-      color: white;
-      border-radius: 5px;
+      border-radius: 30px;
       cursor: pointer;
-      font-weight: 600;
+      margin-left: 25px;
       transition: background-color 0.3s;
+      box-shadow: 0 4px 8px rgba(25,118,210,0.5);
+      vertical-align: middle;
     }
     #startBtn:hover {
       background-color: #115293;
     }
+
+    /* Soru */
+    .question {
+      font-size: 21px;
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+
+    /* Cevaplar */
+    .choices button {
+      display: block;
+      width: 100%;
+      margin: 6px 0;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #f0f0f0;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      text-align: left;
+    }
+    .choices button:hover:not(:disabled) {
+      background-color: #e0e0e0;
+    }
+    .choices button.correct {
+      background-color: #c8e6c9 !important;
+      color: #256029;
+      font-weight: 700;
+    }
+    .choices button.wrong {
+      background-color: #ffcdd2 !important;
+      color: #b71c1c;
+      font-weight: 700;
+    }
+
+    /* Kontrol butonları */
+    .controls {
+      margin-top: 25px;
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+    }
+    .controls button {
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 28px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(25,118,210,0.4);
+      transition: background-color 0.3s;
+    }
+    .controls button:hover {
+      background-color: #115293;
+    }
+    .controls button:disabled {
+      background-color: #a0a0a0;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Skor */
+    #scoreDisplay {
+      margin-top: 15px;
+      font-weight: 700;
+      text-align: center;
+      font-size: 17px;
+      color: #333;
+    }
+
+    /* Sonuç */
+    #result {
+      margin-top: 28px;
+      font-weight: 700;
+      font-size: 20px;
+      text-align: center;
+      color: #222;
+    }
+
     /* Footer */
     footer {
-      margin-top: 30px;
+      margin-top: 38px;
       text-align: center;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 16px;
-      color: #444;
+      font-size: 10px;
+      color: #666;
+      font-weight: 600;
+      letter-spacing: 1.1px;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 12px;
-      font-weight: 600;
-      letter-spacing: 1.2px;
+      gap: 8px;
+      user-select: none;
     }
     footer span.name-year {
       text-transform: uppercase;
       font-style: italic;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
     }
-    footer span.year {
-      font-weight: 400;
-      font-style: normal;
+    footer svg {
+      stroke: #666;
+      width: 14px;
+      height: 14px;
     }
   </style>
 </head>
 <body>
   <div class="quiz-container">
+    <!-- Resim -->
+    <img id="alcImage" src="ALC-course.png" alt="ALC Course Logo" />
 
-    <!-- Başlangıç ayarları -->
+    <!-- Setup -->
     <div id="setup">
       <label for="numQuestions">Kaç soru çözmek istersin?</label>
-      <input type="number" id="numQuestions" min="1" max="100" value="10" style="width: 70px; padding: 5px; border-radius: 4px; border: 1px solid #ccc;" />
-      
-      <label for="difficulty">Zorluk seviyesi:</label>
-      <select id="difficulty" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
-        <option value="easy" selected>Kolay</option>
-        <option value="hard">Zor</option>
-      </select>
+      <input type="number" id="numQuestions" min="1" max="100" value="10" />
+
+      <div class="difficulty-buttons">
+        <button id="btnEasy" class="selected">Kolay</button>
+        <button id="btnHard">Zor</button>
+      </div>
 
       <button id="startBtn">Teste Başla</button>
     </div>
 
-    <!-- Soru ve cevaplar -->
+    <!-- Quiz -->
     <div id="question" class="question" style="display:none;"></div>
-    <div id="choices" class="choices"></div>
+    <div id="choices" class="choices" style="display:none;"></div>
 
-    <!-- Butonlar -->
     <div class="controls" style="display:none;">
       <button id="prevBtn">Geri</button>
       <button id="nextBtn">İleri</button>
       <button id="finishBtn">Bitir</button>
     </div>
 
-    <!-- Doğru / Yanlış Sayacı -->
     <div id="scoreDisplay"></div>
+    <div id="result"></div>
 
-    <!-- Sonuç -->
-    <div id="result" style="text-align:center; margin-top: 20px; font-size: 18px; font-weight: 600;"></div>
-
-    <!-- Footer -->
     <footer>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" fill="none" stroke="#444" stroke-width="2" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
         <path d="M10 50 L20 30 L30 40 L40 20 L50 50 Z" />
         <path d="M30 40 L35 55 L40 40" />
       </svg>
       <span class="name-year">
-        Suat <span class="year">© 2025</span>
+        Suat <span>© 2025</span>
       </span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" fill="none" stroke="#444" stroke-width="2" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
         <path d="M10 50 L20 30 L30 40 L40 20 L50 50 Z" />
         <path d="M30 40 L35 55 L40 40" />
       </svg>
     </footer>
   </div>
 
-  <script>
-    let quiz = [];
-    let current = 0;
-    let score = 0;
-    let total = 0;
-    let answered = [];
+<script>
+  let quiz = [];
+  let current = 0;
+  let score = 0;
+  let total = 0;
+  let answered = [];
 
-    const questionEl = document.getElementById("question");
-    const choicesEl = document.getElementById("choices");
-    const startBtn = document.getElementById("startBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const prevBtn = document.getElementById("prevBtn");
-    const finishBtn = document.getElementById("finishBtn");
-    const resultEl = document.getElementById("result");
-    const scoreDisplay = document.getElementById("scoreDisplay");
-    const setupDiv = document.getElementById("setup");
+  const questionEl = document.getElementById("question");
+  const choicesEl = document.getElementById("choices");
+  const startBtn = document.getElementById("startBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const finishBtn = document.getElementById("finishBtn");
+  const resultEl = document.getElementById("result");
+  const scoreDisplay = document.getElementById("scoreDisplay");
+  const setupDiv = document.getElementById("setup");
 
-    startBtn.onclick = () => {
-      const numQuestions = parseInt(document.getElementById("numQuestions").value);
-      const difficulty = document.getElementById("difficulty").value;
+  const btnEasy = document.getElementById("btnEasy");
+  const btnHard = document.getElementById("btnHard");
 
-      if (isNaN(numQuestions) || numQuestions < 1) {
-        alert("Lütfen geçerli bir soru sayısı giriniz.");
-        return;
-      }
+  // Zorluk seçimi butonları
+  btnEasy.onclick = () => {
+    btnEasy.classList.add("selected");
+    btnHard.classList.remove("selected");
+  };
+  btnHard.onclick = () => {
+    btnHard.classList.add("selected");
+    btnEasy.classList.remove("selected");
+  };
 
-      const jsonFile = difficulty === "easy" ? "quiz-data.json" : "quiz-data_hard.json";
+  startBtn.onclick = () => {
+    const numQuestions = parseInt(document.getElementById("numQuestions").value);
+    const difficulty = btnEasy.classList.contains("selected") ? "easy" : "hard";
 
-      fetch(jsonFile)
-        .then(response => response.json())
-        .then(data => {
-          // Sorulacak soru sayısı kadar rastgele seçelim
-          if (numQuestions > data.length) {
-            alert(`Veritabanında sadece ${data.length} soru var, maksimum bu kadar soru sorulabilir.`);
-            return;
-          }
-
-          quiz = getRandomQuestions(data, numQuestions);
-          current = 0;
-          score = 0;
-          total = quiz.length;
-          answered = new Array(total).fill(null);
-
-          // Arayüz ayarları
-          setupDiv.style.display = "none";
-          questionEl.style.display = "block";
-          choicesEl.style.display = "block";
-          nextBtn.style.display = "inline-block";
-          prevBtn.style.display = "inline-block";
-          finishBtn.style.display = "inline-block";
-          document.querySelector(".controls").style.display = "flex";
-          resultEl.innerHTML = "";
-          scoreDisplay.textContent = `Doğru: 0 | Yanlış: 0`;
-
-          showQuestion();
-        });
-    };
-
-    function getRandomQuestions(arr, n) {
-      const result = [];
-      const taken = new Set();
-      while(result.length < n) {
-        let idx = Math.floor(Math.random() * arr.length);
-        if (!taken.has(idx)) {
-          taken.add(idx);
-          result.push(arr[idx]);
-        }
-      }
-      return result;
+    if (isNaN(numQuestions) || numQuestions < 1) {
+      alert("Lütfen geçerli bir soru sayısı giriniz.");
+      return;
     }
 
-    function showQuestion() {
-      const q = quiz[current];
-      questionEl.textContent = `(${current + 1}/${total}) "${q.word}" kelimesinin anlamı nedir?`;
-      choicesEl.innerHTML = "";
-      q.choices.forEach(choice => {
-        const btn = document.createElement("button");
-        btn.textContent = choice;
+    const jsonFile = difficulty === "easy" ? "quiz-data.json" : "quiz-data_hard.json";
 
-        if (answered[current] !== null) {
-          btn.disabled = true;
-          if (choice === q.answer) btn.classList.add("correct");
-          if (answered[current] === "wrong" && choice === answered[current + "_wrongChoice"]) btn.classList.add("wrong");
+    fetch(jsonFile)
+      .then(response => response.json())
+      .then(data => {
+        if (numQuestions > data.length) {
+          alert(`Veritabanında sadece ${data.length} soru var, maksimum bu kadar soru sorulabilir.`);
+          return;
         }
 
-        btn.onclick = () => selectAnswer(btn, choice === q.answer);
-        choicesEl.appendChild(btn);
+        quiz = getRandomQuestions(data, numQuestions);
+        current = 0;
+        score = 0;
+        total = quiz.length;
+        answered = new Array(total).fill(null);
+
+        setupDiv.style.display = "none";
+        questionEl.style.display = "block";
+        choicesEl.style.display = "block";
+        nextBtn.style.display = "inline-block";
+        prevBtn.style.display = "inline-block";
+        finishBtn.style.display = "inline-block";
+        document.querySelector(".controls").style.display = "flex";
+        resultEl.innerHTML = "";
+        scoreDisplay.style.display = "block";
+        updateScoreDisplay();
+
+        showQuestion();
       });
+  };
 
-      updateScoreDisplay();
+  function getRandomQuestions(arr, n) {
+    const result = [];
+    const taken = new Set();
+    while(result.length < n) {
+      let idx = Math.floor(Math.random() * arr.length);
+      if (!taken.has(idx)) {
+        taken.add(idx);
+        result.push(arr[idx]);
+      }
     }
+    return result;
+  }
 
-    function selectAnswer(button, isCorrect) {
-      if (answered[current] !== null) return;
+  function showQuestion() {
+    const q = quiz[current];
+    questionEl.textContent = `(${current + 1}/${total}) "${q.word}" kelimesinin anlamı nedir?`;
+    choicesEl.innerHTML = "";
 
-      answered[current] = isCorrect ? "correct" : "wrong";
-      if (!isCorrect) answered[current + "_wrongChoice"] = button.textContent;
-      if (isCorrect) score++;
+    q.choices.forEach(choice => {
+      const btn = document.createElement("button");
+      btn.textContent = choice;
 
-      Array.from(choicesEl.children).forEach(btn => {
+      if (answered[current] !== null) {
         btn.disabled = true;
-        if (btn.textContent === quiz[current].answer) btn.classList.add("correct");
-        else if (btn === button) btn.classList.add("wrong");
-      });
+        if (choice === q.answer) btn.classList.add("correct");
+        else if (answered[current] === "wrong" && choice === answered[current + "_wrongChoice"]) btn.classList.add("wrong");
+      }
 
-      updateScoreDisplay();
+      btn.onclick = () => selectAnswer(btn, choice === q.answer);
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(button, isCorrect) {
+    if (answered[current] !== null) return;
+
+    answered[current] = isCorrect ? "correct" : "wrong";
+    if (!isCorrect) answered[current + "_wrongChoice"] = button.textContent;
+    if (isCorrect) score++;
+
+    Array.from(choicesEl.children).forEach(btn => {
+      btn.disabled = true;
+      if (btn.textContent === quiz[current].answer) btn.classList.add("correct");
+      else if (btn === button) btn.classList.add("wrong");
+    });
+
+    updateScoreDisplay();
+  }
+
+  function updateScoreDisplay() {
+    let wrongCount = total - score - answered.filter(a => a === null).length;
+    if (wrongCount < 0) wrongCount = 0;
+    scoreDisplay.textContent = `Doğru: ${score} | Yanlış: ${wrongCount}`;
+  }
+
+  nextBtn.onclick = () => {
+    if (current < total - 1) {
+      current++;
+      showQuestion();
     }
-
-    function updateScoreDisplay() {
-      let wrongCount = total - score - answered.filter(a => a === null).length;
-      if (wrongCount < 0) wrongCount = 0;
-      scoreDisplay.textContent = `Doğru: ${score} | Yanlış: ${wrongCount}`;
+  };
+  prevBtn.onclick = () => {
+    if (current > 0) {
+      current--;
+      showQuestion();
     }
+  };
+  finishBtn.onclick = () => {
+    if (answered.includes(null)) {
+      if (!confirm("Bazı soruları cevaplamadınız, yine de bitirmek istiyor musunuz?")) return;
+    }
+    questionEl.style.display = "none";
+    choicesEl.style.display = "none";
+    document.querySelector(".controls").style.display = "none";
+    scoreDisplay.style.display = "none";
 
-    nextBtn.onclick = () => {
-      if (current < total - 1) {
-        current++;
-        showQuestion();
-      }
-    };
-    prevBtn.onclick = () => {
-      if (current > 0) {
-        current--;
-        showQuestion();
-      }
-    };
-    finishBtn.onclick = () => {
-      if (answered.includes(null)) {
-        if (!confirm("Bazı soruları cevaplamadınız, yine de bitirmek istiyor musunuz?")) return;
-      }
-      questionEl.style.display = "none";
-      choicesEl.style.display = "none";
-      document.querySelector(".controls").style.display = "none";
-      scoreDisplay.style.display = "none";
-
-      resultEl.innerHTML = `Test tamamlandı!<br>Doğru: ${score}<br>Yanlış: ${total - score}`;
-    };
-  </script>
+    resultEl.innerHTML = `Test tamamlandı!<br>Doğru: ${score}<br>Yanlış: ${total - score}`;
+  };
+</script>
 </body>
 </html>
