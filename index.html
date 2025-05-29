@@ -54,45 +54,51 @@
       font-weight: bold;
       text-align: center;
     }
-    .jump {
-      margin-top: 20px;
+    /* input ve buton alanı */
+    .start-settings {
       text-align: center;
+      margin-bottom: 20px;
     }
-    .jump input {
-      width: 100px;
-      padding: 5px;
-      margin-right: 5px;
+    .start-settings input {
+      width: 80px;
+      padding: 8px;
+      font-size: 16px;
+      margin-right: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="quiz-container">
+
     <!-- ALC Course Görseli -->
     <img src="alc-course.png" alt="ALC Course" style="width:100%; max-width:300px; display:block; margin: 0 auto 20px auto; border-radius: 10px;" />
 
+    <!-- Test Ayarları: Kaç soru sorulsun? -->
+    <div class="start-settings">
+      <label for="questionCount">Kaç soru çözmek istiyorsunuz? </label>
+      <input type="number" id="questionCount" min="1" />
+      <button id="startBtn">Teste Başla</button>
+    </div>
+
     <!-- Soru ve cevaplar -->
-    <div id="question" class="question"></div>
-    <div id="choices" class="choices"></div>
+    <div id="question" class="question" style="display:none;"></div>
+    <div id="choices" class="choices" style="display:none;"></div>
 
     <!-- Butonlar -->
-    <div class="controls">
-      <button id="startBtn">Teste Başla</button>
-      <button id="prevBtn" style="display:none;">Geri</button>
-      <button id="nextBtn" style="display:none;">İleri</button>
-      <button id="finishBtn" style="display:none;">Bitir</button>
+    <div class="controls" style="display:none;">
+      <button id="prevBtn" disabled>Geri</button>
+      <button id="nextBtn">İleri</button>
+      <button id="finishBtn">Bitir</button>
     </div>
 
     <!-- Doğru / Yanlış Sayacı -->
-    <div id="scoreDisplay">Doğru: 0 | Yanlış: 0</div>
+    <div id="scoreDisplay" style="display:none;">Doğru: 0 | Yanlış: 0</div>
 
     <!-- Sonuç -->
     <div id="result"></div>
-
-    <!-- Soru numarasına gitme -->
-    <div class="jump">
-      <input type="number" id="jumpTo" placeholder="Soru no gir" min="1" />
-      <button onclick="jumpToQuestion()">Git</button>
-    </div>
   </div>
 
   <script>
@@ -110,20 +116,46 @@
     const finishBtn = document.getElementById("finishBtn");
     const resultEl = document.getElementById("result");
     const scoreDisplay = document.getElementById("scoreDisplay");
+    const questionCountInput = document.getElementById("questionCount");
+    const controlsDiv = document.querySelector(".controls");
+    const startSettingsDiv = document.querySelector(".start-settings");
 
     startBtn.onclick = () => {
       fetch('quiz-data.json')
         .then(response => response.json())
         .then(data => {
-          quiz = data;
+          const maxQuestions = data.length;
+          let numQuestions = parseInt(questionCountInput.value, 10);
+
+          if (isNaN(numQuestions) || numQuestions < 1 || numQuestions > maxQuestions) {
+            alert(`Lütfen 1 ile ${maxQuestions} arasında geçerli bir sayı giriniz.`);
+            return;
+          }
+
+          // Soruları karıştır
+          let shuffled = data.slice();
+          for (let i = shuffled.length -1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+
+          quiz = shuffled.slice(0, numQuestions);
           current = 0;
           score = 0;
           total = quiz.length;
           answered = new Array(total).fill(null);
-          startBtn.style.display = "none";
-          finishBtn.style.display = "block";
-          nextBtn.style.display = "inline";
-          prevBtn.style.display = "none";
+
+          // Arayüz ayarları
+          startSettingsDiv.style.display = "none";
+          questionEl.style.display = "block";
+          choicesEl.style.display = "block";
+          controlsDiv.style.display = "flex";
+          scoreDisplay.style.display = "block";
+          resultEl.innerHTML = "";
+
+          prevBtn.disabled = true;  // ilk soru, geri pasif
+          nextBtn.disabled = false;
+
           showQuestion();
         });
     };
@@ -132,6 +164,7 @@
       const q = quiz[current];
       questionEl.textContent = `(${current + 1}/${total}) "${q.word}" kelimesinin anlamı nedir?`;
       choicesEl.innerHTML = "";
+
       q.choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.textContent = choice;
@@ -140,8 +173,8 @@
         choicesEl.appendChild(btn);
       });
 
-      prevBtn.style.display = current > 0 ? "inline" : "none";
-      nextBtn.style.display = current < total - 1 ? "inline" : "none";
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === total - 1;
 
       updateScoreDisplay();
     }
@@ -184,21 +217,10 @@
     finishBtn.onclick = () => {
       questionEl.style.display = "none";
       choicesEl.style.display = "none";
-      nextBtn.style.display = "none";
-      prevBtn.style.display = "none";
-      finishBtn.style.display = "none";
+      controlsDiv.style.display = "none";
+      scoreDisplay.style.display = "none";
       resultEl.innerHTML = `<h2>Test Bitti!</h2><p>Doğru: ${score} / ${total}</p><p>Yanlış: ${answered.filter(a => a !== null).length - score}</p>`;
     };
-
-    function jumpToQuestion() {
-      const num = parseInt(document.getElementById("jumpTo").value, 10);
-      if (!isNaN(num) && num >= 1 && num <= total) {
-        current = num - 1;
-        showQuestion();
-      } else {
-        alert("Geçersiz soru numarası!");
-      }
-    }
   </script>
 </body>
 </html>
