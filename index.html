@@ -14,7 +14,7 @@
       background: white;
       padding: 20px 30px 50px;
       border-radius: 10px;
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
       position: relative;
@@ -59,12 +59,10 @@
       cursor: pointer;
       transition: background-color 0.3s;
       color: #444;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     .difficulty-buttons button.selected {
       background-color: #1976d2;
       color: white;
-      box-shadow: 0 4px 10px rgba(25,118,210,0.4);
     }
     .difficulty-buttons button:hover:not(.selected) {
       background-color: #bbb;
@@ -79,9 +77,6 @@
       border-radius: 30px;
       cursor: pointer;
       margin-left: 25px;
-      transition: background-color 0.3s;
-      box-shadow: 0 4px 8px rgba(25,118,210,0.5);
-      vertical-align: middle;
     }
     #startBtn:hover {
       background-color: #115293;
@@ -101,7 +96,6 @@
       border-radius: 8px;
       background-color: #f0f0f0;
       cursor: pointer;
-      transition: background-color 0.3s;
       text-align: left;
     }
     .choices button:hover:not(:disabled) {
@@ -132,8 +126,6 @@
       font-weight: 700;
       font-size: 16px;
       cursor: pointer;
-      box-shadow: 0 3px 8px rgba(25,118,210,0.4);
-      transition: background-color 0.3s;
     }
     .controls button:hover {
       background-color: #115293;
@@ -141,7 +133,6 @@
     .controls button:disabled {
       background-color: #a0a0a0;
       cursor: not-allowed;
-      box-shadow: none;
     }
     #finishBtn {
       margin: 20px auto 0;
@@ -154,10 +145,10 @@
       text-align: center;
       font-size: 17px;
     }
-    #scoreDisplay .correct-count {
+    .correct-count {
       color: green;
     }
-    #scoreDisplay .wrong-count {
+    .wrong-count {
       color: red;
     }
     #result {
@@ -167,54 +158,27 @@
       text-align: center;
       color: #222;
     }
-    #wrongTable {
-      margin: 30px auto;
-      border-collapse: collapse;
+    #wrongList {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    #wrongList table {
       width: 100%;
-      max-width: 580px;
-      font-size: 15px;
+      border-collapse: collapse;
     }
-    #wrongTable th, #wrongTable td {
+    #wrongList th, #wrongList td {
       border: 1px solid #ccc;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    #wrongTable th {
-      background-color: #eee;
-    }
-    #wrongTable td.wrong {
-      color: #b71c1c;
-      font-weight: bold;
-    }
-    #wrongTable td.correct {
-      color: #256029;
-      font-weight: bold;
-    }
-    footer {
-      margin-top: 38px;
+      padding: 8px;
       text-align: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 10px;
-      color: #666;
-      font-weight: 600;
-      letter-spacing: 1.1px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      user-select: none;
     }
-    footer span.name-year {
-      text-transform: uppercase;
-      font-style: italic;
-      display: flex;
-      gap: 6px;
-      align-items: center;
+    #wrongList th {
+      background-color: #f2f2f2;
     }
-    footer svg {
-      stroke: #666;
-      width: 14px;
-      height: 14px;
+    #wrongList tr td:nth-child(2) {
+      color: red;
+    }
+    #wrongList tr td:nth-child(3) {
+      color: green;
     }
   </style>
 </head>
@@ -230,38 +194,20 @@
       </div>
       <button id="startBtn">Teste Başla</button>
     </div>
-
     <div id="question" class="question" style="display:none;"></div>
     <div id="choices" class="choices" style="display:none;"></div>
-
     <div class="controls" style="display:none;">
       <button id="prevBtn">Geri</button>
       <button id="nextBtn">İleri</button>
     </div>
-
     <button id="finishBtn" style="display:none;">Bitir</button>
-
     <div id="scoreDisplay"></div>
     <div id="result"></div>
     <div id="wrongList"></div>
-
-    <footer>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M10 50 L20 30 L30 40 L40 20 L50 50 Z" />
-        <path d="M30 40 L35 55 L40 40" />
-      </svg>
-      <span class="name-year">
-        Suat <span>© 2025</span>
-      </span>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M10 50 L20 30 L30 40 L40 20 L50 50 Z" />
-        <path d="M30 40 L35 55 L40 40" />
-      </svg>
-    </footer>
   </div>
 
 <script>
-  let quiz = [], current = 0, total = 0, answered = [];
+  let quiz = [], current = 0, score = 0, total = 0, answered = [];
 
   const questionEl = document.getElementById("question");
   const choicesEl = document.getElementById("choices");
@@ -272,10 +218,9 @@
   const resultEl = document.getElementById("result");
   const scoreDisplay = document.getElementById("scoreDisplay");
   const setupDiv = document.getElementById("setup");
-  const wrongListEl = document.getElementById("wrongList");
-
   const btnEasy = document.getElementById("btnEasy");
   const btnHard = document.getElementById("btnHard");
+  const wrongList = document.getElementById("wrongList");
 
   btnEasy.onclick = () => {
     btnEasy.classList.add("selected");
@@ -289,83 +234,68 @@
   startBtn.onclick = () => {
     const numQuestions = parseInt(document.getElementById("numQuestions").value);
     const difficulty = btnEasy.classList.contains("selected") ? "easy" : "hard";
-    const jsonFile = difficulty === "easy" ? "quiz-data.json" : "quiz-data_hard.json";
-
     if (isNaN(numQuestions) || numQuestions < 1) {
       alert("Lütfen geçerli bir soru sayısı giriniz.");
       return;
     }
-
-    fetch(jsonFile)
-      .then(res => res.json())
-      .then(data => {
-        if (numQuestions > data.length) {
-          alert(`Veritabanında sadece ${data.length} soru var.`);
-          return;
-        }
-        quiz = getRandomQuestions(data, numQuestions);
-        current = 0;
-        total = quiz.length;
-        answered = new Array(total).fill(null);
-        setupDiv.style.display = "none";
-        questionEl.style.display = "block";
-        choicesEl.style.display = "block";
-        nextBtn.style.display = "inline-block";
-        prevBtn.style.display = "inline-block";
-        finishBtn.style.display = "block";
-        document.querySelector(".controls").style.display = "flex";
-        resultEl.textContent = "";
-        scoreDisplay.textContent = "";
-        wrongListEl.innerHTML = "";
-        showQuestion();
-        updateButtons();
-      })
-      .catch(() => {
-        alert("Zor mod verileri yüklenemedi. Dosya mevcut olmayabilir.");
-      });
+    const jsonFile = difficulty === "easy" ? "quiz-data.json" : "quiz-data_hard.json";
+    fetch(jsonFile).then(r => r.json()).then(data => {
+      if (numQuestions > data.length) {
+        alert(`En fazla ${data.length} soru var.`);
+        return;
+      }
+      quiz = getRandomQuestions(data, numQuestions);
+      current = 0;
+      total = quiz.length;
+      answered = new Array(total).fill(null);
+      setupDiv.style.display = "none";
+      questionEl.style.display = "block";
+      choicesEl.style.display = "block";
+      document.querySelector(".controls").style.display = "flex";
+      nextBtn.style.display = "inline-block";
+      prevBtn.style.display = "inline-block";
+      finishBtn.style.display = "block";
+      resultEl.textContent = "";
+      wrongList.innerHTML = "";
+      scoreDisplay.innerHTML = `
+        <span class="correct-count">Doğru: 0</span> /
+        <span class="wrong-count">Yanlış: 0</span> /
+        <span>Toplam: ${total}</span>
+      `;
+      showQuestion();
+      updateButtons();
+    });
   };
 
+  nextBtn.onclick = () => { if (current < total - 1) { current++; showQuestion(); updateButtons(); } };
+  prevBtn.onclick = () => { if (current > 0) { current--; showQuestion(); updateButtons(); } };
+
   finishBtn.onclick = () => {
-    let correct = 0, wrongTable = `<table id="wrongTable"><thead><tr><th>#</th><th>Kelime</th><th>Senin Cevabın</th><th>Doğru Cevap</th></tr></thead><tbody>`;
+    let correctCount = 0;
+    wrongList.innerHTML = '';
+    let wrongs = `<table><tr><th>Soru</th><th>Senin Cevabın</th><th>Doğru Cevap</th></tr>`;
     for (let i = 0; i < total; i++) {
-      if (answered[i] === quiz[i].answer) correct++;
-      else {
-        wrongTable += `<tr><td>${i + 1}</td><td>${quiz[i].word}</td><td class="wrong">${answered[i] || "-"}</td><td class="correct">${quiz[i].answer}</td></tr>`;
+      if (answered[i] === quiz[i].answer) correctCount++;
+      else if (answered[i]) {
+        wrongs += `<tr><td>${quiz[i].word}</td><td>${answered[i]}</td><td>${quiz[i].answer}</td></tr>`;
       }
     }
-    wrongTable += "</tbody></table>";
-
-    const wrong = total - correct;
+    wrongs += "</table>";
+    wrongList.innerHTML = wrongs;
     scoreDisplay.innerHTML = `
-      <span class="correct-count">Doğru: ${correct}</span> /
-      <span class="wrong-count">Yanlış: ${wrong}</span> /
+      <span class="correct-count">Doğru: ${correctCount}</span> /
+      <span class="wrong-count">Yanlış: ${total - correctCount}</span> /
       <span>Toplam: ${total}</span>
     `;
-    resultEl.textContent = "Test tamamlandı!";
-    wrongListEl.innerHTML = wrong > 0 ? wrongTable : "<p style='text-align:center;'>Tüm sorular doğru cevaplandı. 🎉</p>";
+    resultEl.textContent = "Test tamamlandı! Aşağıda yanlışlarınızı görebilirsiniz.";
     nextBtn.disabled = true;
     prevBtn.disabled = true;
     finishBtn.disabled = true;
     choicesEl.querySelectorAll("button").forEach(b => b.disabled = true);
   };
 
-  nextBtn.onclick = () => {
-    if (current < total - 1) {
-      current++;
-      showQuestion();
-      updateButtons();
-    }
-  };
-  prevBtn.onclick = () => {
-    if (current > 0) {
-      current--;
-      showQuestion();
-      updateButtons();
-    }
-  };
-
   function showQuestion() {
-    questionEl.textContent = `Soru ${current + 1} / ${total}: "${quiz[current].word}" kelimesinin anlamı nedir?`;
+    questionEl.textContent = `Soru ${current + 1}: "${quiz[current].word}" kelimesinin anlamı nedir?`;
     choicesEl.innerHTML = "";
     quiz[current].choices.forEach(choice => {
       const btn = document.createElement("button");
@@ -373,6 +303,7 @@
       btn.onclick = () => {
         answered[current] = choice;
         showQuestion();
+        updateScoreDuringTest();
       };
       if (answered[current] !== null) {
         if (choice === quiz[current].answer) btn.classList.add("correct");
@@ -384,12 +315,29 @@
   }
 
   function updateButtons() {
-    prevBtn.disabled = current === 0;
-    nextBtn.disabled = current === total - 1;
+    prevBtn.disabled = (current === 0);
+    nextBtn.disabled = (current === total - 1);
+  }
+
+  function updateScoreDuringTest() {
+    let correct = 0, attempted = 0;
+    for (let i = 0; i < total; i++) {
+      if (answered[i] !== null) {
+        attempted++;
+        if (answered[i] === quiz[i].answer) correct++;
+      }
+    }
+    const wrong = attempted - correct;
+    scoreDisplay.innerHTML = `
+      <span class="correct-count">Doğru: ${correct}</span> /
+      <span class="wrong-count">Yanlış: ${wrong}</span> /
+      <span>Toplam: ${total}</span>
+    `;
   }
 
   function getRandomQuestions(arr, num) {
-    return arr.sort(() => 0.5 - Math.random()).slice(0, num);
+    const shuffled = arr.slice().sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, num);
   }
 </script>
 </body>
