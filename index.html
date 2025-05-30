@@ -10,24 +10,27 @@
       margin: 40px;
       background-color: #f9f9f9;
     }
+
     .quiz-container {
       background: white;
       padding: 20px 30px 50px;
       border-radius: 10px;
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      position: relative;
     }
+
     #alcImage {
       display: block;
       margin: 0 auto 25px;
       max-width: 180px;
     }
+
     #setup {
       text-align: center;
       margin-bottom: 35px;
     }
+
     #numQuestions {
       width: 80px;
       padding: 6px 10px;
@@ -35,169 +38,136 @@
       border-radius: 5px;
       border: 1.5px solid #ccc;
       margin-left: 10px;
-      margin-right: 25px;
-      vertical-align: middle;
     }
-    label {
-      font-weight: 600;
-      font-size: 16px;
-      vertical-align: middle;
-    }
-    .difficulty-buttons {
-      display: inline-block;
-      margin-left: 10px;
-      vertical-align: middle;
-    }
+
     .difficulty-buttons button {
       background-color: #ddd;
       border: none;
       border-radius: 25px;
       padding: 8px 20px;
-      margin: 0 6px;
+      margin: 10px 6px;
       font-weight: 600;
       font-size: 15px;
       cursor: pointer;
-      transition: background-color 0.3s;
-      color: #444;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
+
     .difficulty-buttons button.selected {
       background-color: #1976d2;
       color: white;
-      box-shadow: 0 4px 10px rgba(25,118,210,0.4);
     }
-    .difficulty-buttons button:hover:not(.selected) {
-      background-color: #bbb;
-    }
+
     #startBtn {
       padding: 10px 30px;
-      font-weight: 700;
       font-size: 17px;
-      color: white;
       background-color: #1976d2;
+      color: white;
       border: none;
       border-radius: 30px;
       cursor: pointer;
-      margin-left: 25px;
-      transition: background-color 0.3s;
-      box-shadow: 0 4px 8px rgba(25,118,210,0.5);
-      vertical-align: middle;
+      margin-top: 20px;
     }
-    #startBtn:hover {
-      background-color: #115293;
-    }
+
     .question {
-      font-size: 21px;
-      margin-bottom: 14px;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    #progress {
+      text-align: center;
+      margin-bottom: 10px;
       font-weight: 600;
     }
+
     .choices button {
       display: block;
       width: 100%;
-      margin: 6px 0;
-      padding: 12px 15px;
+      padding: 10px;
+      margin: 8px 0;
       font-size: 16px;
       border: none;
       border-radius: 8px;
       background-color: #f0f0f0;
       cursor: pointer;
-      transition: background-color 0.3s;
-      text-align: left;
     }
-    .choices button:hover:not(:disabled) {
-      background-color: #e0e0e0;
-    }
+
     .choices button.correct {
-      background-color: #c8e6c9 !important;
+      background-color: #c8e6c9;
       color: #256029;
-      font-weight: 700;
+      font-weight: bold;
     }
+
     .choices button.wrong {
-      background-color: #ffcdd2 !important;
+      background-color: #ffcdd2;
       color: #b71c1c;
-      font-weight: 700;
+      font-weight: bold;
     }
+
     .controls {
-      margin-top: 25px;
       display: flex;
       justify-content: center;
-      gap: 36px;
+      gap: 20px;
+      margin-top: 20px;
     }
+
     .controls button {
+      padding: 10px 25px;
+      font-size: 16px;
+      border-radius: 20px;
+      border: none;
       background-color: #1976d2;
       color: white;
-      border: none;
-      border-radius: 25px;
-      padding: 10px 28px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(25,118,210,0.4);
-      transition: background-color 0.3s;
     }
-    .controls button:hover {
-      background-color: #115293;
-    }
-    .controls button:disabled {
-      background-color: #a0a0a0;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
+
     #finishBtn {
-      margin: 20px auto 0;
       display: block;
-      max-width: 120px;
+      margin: 20px auto;
     }
+
     #scoreDisplay {
-      margin-top: 15px;
-      font-weight: 700;
       text-align: center;
-      font-size: 17px;
-      color: #333;
-    }
-    #result {
-      margin-top: 28px;
-      font-weight: 700;
       font-size: 18px;
-      text-align: center;
-      color: #222;
+      font-weight: bold;
+      margin-top: 20px;
     }
-    #result ul {
+
+    .score-correct {
+      color: green;
+    }
+
+    .score-wrong {
+      color: red;
+    }
+
+    #wrongList {
+      margin-top: 25px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
       text-align: left;
-      padding-left: 30px;
     }
-    footer {
-      margin-top: 38px;
-      text-align: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 10px;
-      color: #666;
-      font-weight: 600;
-      letter-spacing: 1.1px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      user-select: none;
+
+    th {
+      background-color: #f2f2f2;
     }
-    footer span.name-year {
-      text-transform: uppercase;
-      font-style: italic;
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-    footer svg {
-      stroke: #666;
-      width: 14px;
-      height: 14px;
+
+    tr.wrong-row {
+      background-color: #ffe6e6;
     }
   </style>
 </head>
 <body>
   <div class="quiz-container">
     <img id="alcImage" src="alc-course.png" alt="ALC Course Logo" />
+
     <div id="setup">
       <label for="numQuestions">Kaç soru çözmek istersin?</label>
       <input type="number" id="numQuestions" min="1" max="100" value="10" />
@@ -207,200 +177,166 @@
       </div>
       <button id="startBtn">Teste Başla</button>
     </div>
+
+    <div id="progress"></div>
     <div id="question" class="question" style="display:none;"></div>
     <div id="choices" class="choices" style="display:none;"></div>
+
     <div class="controls" style="display:none;">
       <button id="prevBtn">Geri</button>
       <button id="nextBtn">İleri</button>
     </div>
+
     <button id="finishBtn" style="display:none;">Bitir</button>
+
     <div id="scoreDisplay"></div>
-    <div id="result"></div>
-    <footer>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M10 50 L20 30 L30 40 L40 20 L50 50 Z" />
-        <path d="M30 40 L35 55 L40 40" />
-      </svg>
-      <span class="name-year">Suat <span>© 2025</span></span>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-        <path d="M10 50 L20 30 L30 40 L40 20 L50 50 Z" />
-        <path d="M30 40 L35 55 L40 40" />
-      </svg>
-    </footer>
+    <div id="wrongList"></div>
   </div>
 
-<script>
-  let quiz = [];
-  let current = 0;
-  let score = 0;
-  let total = 0;
-  let answered = [];
+  <script>
+    let quiz = [], current = 0, answered = [], total = 0;
 
-  const questionEl = document.getElementById("question");
-  const choicesEl = document.getElementById("choices");
-  const startBtn = document.getElementById("startBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const prevBtn = document.getElementById("prevBtn");
-  const finishBtn = document.getElementById("finishBtn");
-  const resultEl = document.getElementById("result");
-  const scoreDisplay = document.getElementById("scoreDisplay");
-  const setupDiv = document.getElementById("setup");
+    const btnEasy = document.getElementById("btnEasy");
+    const btnHard = document.getElementById("btnHard");
+    const startBtn = document.getElementById("startBtn");
+    const questionEl = document.getElementById("question");
+    const choicesEl = document.getElementById("choices");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const finishBtn = document.getElementById("finishBtn");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const progress = document.getElementById("progress");
+    const wrongList = document.getElementById("wrongList");
 
-  const btnEasy = document.getElementById("btnEasy");
-  const btnHard = document.getElementById("btnHard");
+    btnEasy.onclick = () => {
+      btnEasy.classList.add("selected");
+      btnHard.classList.remove("selected");
+    };
 
-  btnEasy.onclick = () => {
-    btnEasy.classList.add("selected");
-    btnHard.classList.remove("selected");
-  };
+    btnHard.onclick = () => {
+      btnHard.classList.add("selected");
+      btnEasy.classList.remove("selected");
+    };
 
-  btnHard.onclick = () => {
-    alert("Zor mod henüz hazır değil. Lütfen daha sonra tekrar deneyin.");
-    return;
-  };
+    startBtn.onclick = () => {
+      const numQuestions = parseInt(document.getElementById("numQuestions").value);
+      const difficulty = btnEasy.classList.contains("selected") ? "easy" : "hard";
 
-  startBtn.onclick = () => {
-    const numQuestions = parseInt(document.getElementById("numQuestions").value);
-    const difficulty = btnEasy.classList.contains("selected") ? "easy" : "hard";
+      if (difficulty === "hard") {
+        alert("Zor mod şu anda hazır değil. Lütfen daha sonra tekrar deneyin.");
+        return;
+      }
 
-    if (difficulty === "hard") {
-      alert("Zor mod henüz hazır değil. Lütfen daha sonra tekrar deneyin.");
-      return;
-    }
+      fetch("quiz-data.json")
+        .then(res => res.json())
+        .then(data => {
+          if (numQuestions > data.length) {
+            alert("Veritabanında sadece " + data.length + " soru var.");
+            return;
+          }
+          quiz = shuffle(data).slice(0, numQuestions);
+          total = quiz.length;
+          answered = Array(total).fill(null);
+          current = 0;
 
-    if (isNaN(numQuestions) || numQuestions < 1) {
-      alert("Lütfen geçerli bir soru sayısı giriniz.");
-      return;
-    }
+          document.getElementById("setup").style.display = "none";
+          questionEl.style.display = "block";
+          choicesEl.style.display = "block";
+          document.querySelector(".controls").style.display = "flex";
+          finishBtn.style.display = "block";
 
-    fetch("quiz-data.json")
-      .then(response => response.json())
-      .then(data => {
-        if (numQuestions > data.length) {
-          alert(`Veritabanında sadece ${data.length} soru var, maksimum bu kadar soru sorulabilir.`);
-          return;
-        }
-
-        quiz = getRandomQuestions(data, numQuestions);
-        current = 0;
-        score = 0;
-        total = quiz.length;
-        answered = new Array(total).fill(null);
-
-        setupDiv.style.display = "none";
-        questionEl.style.display = "block";
-        choicesEl.style.display = "block";
-        nextBtn.style.display = "inline-block";
-        prevBtn.style.display = "inline-block";
-        finishBtn.style.display = "block";
-        document.querySelector(".controls").style.display = "flex";
-        resultEl.textContent = "";
-        scoreDisplay.textContent = "";
-
-        showQuestion();
-        updateButtons();
-      });
-  };
-
-  nextBtn.onclick = () => {
-    if (current < total - 1) {
-      current++;
-      showQuestion();
-      updateButtons();
-    }
-  };
-
-  prevBtn.onclick = () => {
-    if (current > 0) {
-      current--;
-      showQuestion();
-      updateButtons();
-    }
-  };
-
-  finishBtn.onclick = () => {
-    let correctCount = 0;
-    let wrongAnswers = [];
-
-    for (let i = 0; i < total; i++) {
-      if (answered[i] === quiz[i].answer) {
-        correctCount++;
-      } else {
-        wrongAnswers.push({
-          word: quiz[i].word,
-          correct: quiz[i].answer,
-          yourAnswer: answered[i] ?? "Cevaplanmamış"
+          showQuestion();
         });
-      }
+    };
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
     }
 
-    const wrongCount = total - correctCount;
-    scoreDisplay.textContent = `Doğru: ${correctCount} / Yanlış: ${wrongCount}`;
-    resultEl.innerHTML = "Test tamamlandı!<br><br>";
+    function showQuestion() {
+      const q = quiz[current];
+      questionEl.textContent = `Soru ${current + 1}: "${q.word}" kelimesinin anlamı nedir?`;
+      progress.textContent = `Soru: ${current + 1} / ${total}`;
+      choicesEl.innerHTML = "";
 
-    if (wrongAnswers.length > 0) {
-      const list = document.createElement("ul");
-      wrongAnswers.forEach(item => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${item.word}</strong>: Doğru cevap: <em>${item.correct}</em>, Senin cevabın: <em>${item.yourAnswer}</em>`;
-        list.appendChild(li);
+      q.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+
+        if (answered[current] !== null) {
+          btn.disabled = true;
+          if (choice === q.answer) btn.classList.add("correct");
+          if (choice === answered[current] && choice !== q.answer) btn.classList.add("wrong");
+        } else {
+          btn.onclick = () => {
+            answered[current] = choice;
+            showQuestion();
+            updateScore();
+          };
+        }
+
+        choicesEl.appendChild(btn);
       });
-      resultEl.appendChild(list);
-    } else {
-      resultEl.innerHTML += "Tüm cevaplar doğru!";
+
+      prevBtn.disabled = (current === 0);
+      nextBtn.disabled = (current === total - 1);
     }
 
-    nextBtn.disabled = true;
-    prevBtn.disabled = true;
-    finishBtn.disabled = true;
-    choicesEl.querySelectorAll("button").forEach(b => b.disabled = true);
-  };
-
-  function showQuestion() {
-    questionEl.textContent = `Soru ${current + 1}: "${quiz[current].word}" kelimesinin anlamı nedir?`;
-    choicesEl.innerHTML = "";
-    quiz[current].choices.forEach(choice => {
-      const btn = document.createElement("button");
-      btn.textContent = choice;
-      btn.onclick = () => {
-        answered[current] = choice;
-        updateScore();
+    nextBtn.onclick = () => {
+      if (current < total - 1) {
+        current++;
         showQuestion();
-      };
-      if (answered[current] !== null) {
-        if (choice === quiz[current].answer) {
-          btn.classList.add("correct");
-        }
-        if (choice === answered[current] && answered[current] !== quiz[current].answer) {
-          btn.classList.add("wrong");
-        }
-        btn.disabled = true;
       }
-      choicesEl.appendChild(btn);
-    });
-  }
+    };
 
-  function updateScore() {
-    let correctCount = 0;
-    let wrongCount = 0;
-    for (let i = 0; i < total; i++) {
-      if (answered[i] !== null) {
-        if (answered[i] === quiz[i].answer) correctCount++;
-        else wrongCount++;
+    prevBtn.onclick = () => {
+      if (current > 0) {
+        current--;
+        showQuestion();
       }
+    };
+
+    finishBtn.onclick = () => {
+      let correct = 0;
+      let wrongListHTML = "";
+
+      let wrongs = [];
+
+      for (let i = 0; i < total; i++) {
+        if (answered[i] === quiz[i].answer) {
+          correct++;
+        } else {
+          wrongs.push({
+            word: quiz[i].word,
+            yourAnswer: answered[i],
+            correctAnswer: quiz[i].answer
+          });
+        }
+      }
+
+      scoreDisplay.innerHTML = `<span class="score-correct">Doğru: ${correct}</span> | <span class="score-wrong">Yanlış: ${total - correct}</span>`;
+
+      if (wrongs.length > 0) {
+        wrongListHTML += `<table><thead><tr><th>Kelime</th><th>Senin Cevabın</th><th>Doğru Cevap</th></tr></thead><tbody>`;
+        wrongs.forEach(item => {
+          wrongListHTML += `<tr class="wrong-row"><td>${item.word}</td><td>${item.yourAnswer}</td><td>${item.correctAnswer}</td></tr>`;
+        });
+        wrongListHTML += "</tbody></table>";
+        wrongList.innerHTML = wrongListHTML;
+      } else {
+        wrongList.innerHTML = "<p style='text-align:center;color:green;'>Tebrikler! Tüm cevaplar doğru.</p>";
+      }
+
+      finishBtn.disabled = true;
+      nextBtn.disabled = true;
+      prevBtn.disabled = true;
+      choicesEl.querySelectorAll("button").forEach(btn => btn.disabled = true);
+    };
+
+    function updateScore() {
+      let correct = answered.filter((ans, i) => ans === quiz[i].answer).length;
+      scoreDisplay.innerHTML = `<span class="score-correct">Doğru: ${correct}</span> | <span class="score-wrong">Yanlış: ${total - correct}</span>`;
     }
-    scoreDisplay.textContent = `Doğru: ${correctCount} / Yanlış: ${wrongCount}`;
-  }
-
-  function updateButtons() {
-    prevBtn.disabled = (current === 0);
-    nextBtn.disabled = (current === total - 1);
-  }
-
-  function getRandomQuestions(arr, num) {
-    const shuffled = arr.slice().sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, num);
-  }
-</script>
+  </script>
 </body>
 </html>
