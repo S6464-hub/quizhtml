@@ -34,17 +34,15 @@
       background-color: #f1f1f1;
     }
     button.deleteBtn {
-      background-color: #e53935;
+      background-color: #d32f2f;
       color: white;
       border: none;
-      padding: 6px 12px;
       border-radius: 4px;
+      padding: 5px 12px;
       cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s;
     }
     button.deleteBtn:hover {
-      background-color: #b71c1c;
+      background-color: #9a0007;
     }
   </style>
 </head>
@@ -85,48 +83,56 @@
 
     const tableBody = document.getElementById("logTableBody");
 
-    // Firebase'den verileri çek ve tarihe göre azalan şekilde sırala
+    // Verileri çek ve tarihe göre sırala (en yenisi en üstte)
     firebase.database().ref("quizLogs").once("value", snapshot => {
-      const entries = [];
+      let entries = [];
       snapshot.forEach(child => {
-        const data = child.val();
-        entries.push({ key: child.key, data });
+        entries.push({ key: child.key, data: child.val() });
       });
 
       // Tarihe göre azalan sırala
-      entries.sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
+      entries.sort((a, b) => {
+        let dateA = new Date(a.data.date);
+        let dateB = new Date(b.data.date);
+        return dateB - dateA;
+      });
 
-      // Tabloya ekle
       entries.forEach(entry => {
         const { key, data } = entry;
         const row = document.createElement("tr");
 
-        const formattedDate = new Date(data.date).toLocaleString("tr-TR");
+        let dateObj = new Date(data.date);
+        if (isNaN(dateObj)) {
+          dateObj = null;
+        }
+        const formattedDate = dateObj ? dateObj.toLocaleString("tr-TR") : "-";
 
         row.innerHTML = `
           <td>${data.user || '-'}</td>
           <td>${formattedDate}</td>
-          <td>${data.totalQuestions}</td>
-          <td style="color:green">${data.correct}</td>
-          <td style="color:red">${data.wrong}</td>
-          <td><button class="deleteBtn">Sil</button></td>
+          <td>${data.totalQuestions ?? '-'}</td>
+          <td style="color:green">${data.correct ?? 0}</td>
+          <td style="color:red">${data.wrong ?? 0}</td>
+          <td><button class="deleteBtn" data-key="${key}">Sil</button></td>
         `;
+        tableBody.appendChild(row);
+      });
 
-        // Sil butonuna tıklayınca ilgili kaydı Firebase'den sil
-        row.querySelector(".deleteBtn").onclick = () => {
-          if (confirm("Bu kaydı silmek istediğinizden emin misiniz?")) {
-            firebase.database().ref("quizLogs").child(key).remove()
+      // Silme butonları için event listener
+      tableBody.querySelectorAll("button.deleteBtn").forEach(button => {
+        button.addEventListener("click", e => {
+          const key = e.target.getAttribute("data-key");
+          if (confirm("Bu kaydı silmek istediğinize emin misiniz?")) {
+            firebase.database().ref("quizLogs/" + key).remove()
               .then(() => {
                 alert("Kayıt başarıyla silindi.");
-                row.remove();
+                location.reload();
               })
               .catch(err => {
-                alert("Kayıt silinirken hata oluştu: " + err.message);
+                alert("Silme sırasında hata oluştu: " + err.message);
               });
           }
-        };
-
-        tableBody.appendChild(row);
+        });
       });
     });
   </script>
