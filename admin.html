@@ -46,7 +46,8 @@
       <tr>
         <th>Kullanıcı</th>
         <th>Durum</th>
-        <th>Başlangıç Tarihi</th> <th>Bitiş Tarihi</th>    <th>Soru</th>
+        <th>Tarih</th>
+        <th>Soru</th>
         <th>Doğru</th>
         <th>Yanlış</th>
         <th>Sil</th>
@@ -55,6 +56,7 @@
     <tbody id="logTableBody"></tbody>
   </table>
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
@@ -72,22 +74,19 @@
 
     const tableBody = document.getElementById("logTableBody");
 
-    firebase.database().ref("quizLogs").orderByChild("startTime").once("value", snapshot => { // orderByChild "startTime" olarak güncellendi
+    firebase.database().ref("quizLogs").orderByChild("date").once("value", snapshot => {
       const logs = [];
       snapshot.forEach(child => {
         logs.push({ id: child.key, ...child.val() });
       });
       logs.reverse().forEach(data => {
         const tr = document.createElement("tr");
-
-        // Tarihleri kontrol ederek formatla
-        const startTime = data.startTime ? new Date(data.startTime).toLocaleString("tr-TR") : "-";
-        const endTime = data.endTime ? new Date(data.endTime).toLocaleString("tr-TR") : "-";
+        const date = new Date(data.date).toLocaleString("tr-TR");
 
         tr.innerHTML = `
           <td>${data.user || "-"}</td>
-          <td>${data.status || "-"}</td> <td>${startTime}</td>
-          <td>${endTime}</td>
+          <td>${data.status || "bitti"}</td>
+          <td>${date}</td>
           <td>${data.totalQuestions || "-"}</td>
           <td style="color:green">${data.correct ?? "-"}</td>
           <td style="color:red">${data.wrong ?? "-"}</td>
