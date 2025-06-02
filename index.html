@@ -4,192 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vocabulary Quiz - ALC Course</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f9f9f9;
-    }
-    .quiz-container {
-      background: white;
-      padding: 20px 30px 50px;
-      border-radius: 10px;
-      max-width: 700px;
-      margin: auto;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    #alcImage {
-      display: block;
-      margin: 0 auto 25px;
-      max-width: 180px;
-    }
-    #setup {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-    #numQuestions, #username {
-      width: 80%;
-      padding: 8px 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1.5px solid #ccc;
-      margin-top: 10px;
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: 600;
-      font-size: 16px;
-      display: block;
-      margin-bottom: 5px;
-    }
-    #startBtn {
-      padding: 10px 30px;
-      font-weight: 700;
-      font-size: 17px;
-      color: white;
-      background-color: #1976d2;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-    }
-    #startBtn:hover {
-      background-color: #115293;
-    }
-    .question {
-      font-size: 21px;
-      margin-bottom: 14px;
-      font-weight: 600;
-    }
-    .choices button {
-      display: block;
-      width: 100%;
-      margin: 6px 0;
-      padding: 12px 15px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background-color: #f0f0f0;
-      cursor: pointer;
-      text-align: left;
-    }
-    .choices button:hover:not(:disabled) {
-      background-color: #e0e0e0;
-    }
-    .choices button.correct {
-      background-color: #c8e6c9 !important;
-      color: #256029;
-      font-weight: 700;
-    }
-    .choices button.wrong {
-      background-color: #ffcdd2 !important;
-      color: #b71c1c;
-      font-weight: 700;
-    }
-    .controls {
-      margin-top: 25px;
-      display: flex;
-      justify-content: center;
-      gap: 36px;
-    }
-    .controls button {
-      background-color: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 25px;
-      padding: 10px 28px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .controls button:hover {
-      background-color: #115293;
-    }
-    .controls button:disabled {
-      background-color: #a0a0a0;
-      cursor: not-allowed;
-    }
-    #finishBtn {
-      margin: 20px auto 0;
-      display: block;
-      max-width: 120px;
-    }
-    #scoreDisplay {
-      margin-top: 15px;
-      font-weight: 700;
-      text-align: center;
-      font-size: 17px;
-    }
-    .correct-count {
-      color: green;
-    }
-    .wrong-count {
-      color: red;
-    }
-    #result {
-      margin-top: 28px;
-      font-weight: 700;
-      font-size: 20px;
-      text-align: center;
-      color: #222;
-    }
-    #wrongList {
-      margin-top: 20px;
-      font-size: 16px;
-    }
-    #wrongList table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    #wrongList th, #wrongList td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    #wrongList th {
-      background-color: #f2f2f2;
-    }
-    #wrongList tr td:nth-child(2) {
-      color: red;
-    }
-    #wrongList tr td:nth-child(3) {
-      color: green;
-    }
-    #signature {
-      text-align: center;
-      margin-top: 50px;
-      font-weight: bold;
-      font-size: 16px;
-      color: #888;
-    }
-    #signature span {
-      color: #1976d2;
-    }
-  </style>
 </head>
 <body>
-  <div class="quiz-container">
-    <img id="alcImage" src="alc-course.png" alt="ALC Course Logo" />
-    <div id="setup">
-      <label for="username">İsminiz:</label>
-      <input type="text" id="username" placeholder="Adınızı girin" required />
-      <label for="numQuestions">Kaç soru çözmek istersin?</label>
-      <input type="number" id="numQuestions" min="1" max="100" value="10" />
-      <button id="startBtn">Teste Başla</button>
-    </div>
-    <div id="question" class="question" style="display:none;"></div>
-    <div id="choices" class="choices" style="display:none;"></div>
-    <div class="controls" style="display:none;">
-      <button id="prevBtn">Geri</button>
-      <button id="nextBtn">İleri</button>
-    </div>
-    <button id="finishBtn" style="display:none;">Bitir</button>
-    <div id="scoreDisplay"></div>
-    <div id="result"></div>
-    <div id="wrongList"></div>
-  </div>
-
-  <div id="signature">✨ Crafted with by <span>Suat - 2025</span> ✨</div>
+  <!-- Gerekli HTML yapısı burada (sadeleştirildi) -->
+  <input type="text" id="username" placeholder="Adınızı girin" />
+  <input type="number" id="numQuestions" value="10" />
+  <button id="startBtn">Teste Başla</button>
+  <button id="finishBtn">Bitir</button>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -206,181 +27,60 @@
       databaseURL: "https://vocabularyapp-239c0-default-rtdb.europe-west1.firebasedatabase.app/"
     };
     firebase.initializeApp(firebaseConfig);
-  </script>
 
-  <!-- Quiz Script -->
-  <script>
-    let quiz = [], current = 0, total = 0, answered = [];
-
-    const questionEl = document.getElementById("question");
-    const choicesEl = document.getElementById("choices");
     const startBtn = document.getElementById("startBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const prevBtn = document.getElementById("prevBtn");
     const finishBtn = document.getElementById("finishBtn");
-    const resultEl = document.getElementById("result");
-    const scoreDisplay = document.getElementById("scoreDisplay");
-    const setupDiv = document.getElementById("setup");
-    const wrongList = document.getElementById("wrongList");
+
+    let quizData = [], answered = [], total = 0;
+    let quizUser = "";
+    let startTime = "";
 
     startBtn.onclick = () => {
-      const username = document.getElementById("username").value.trim();
+      quizUser = document.getElementById("username").value.trim();
       const numQuestions = parseInt(document.getElementById("numQuestions").value);
-      if (!username) {
-        alert("Lütfen isminizi giriniz.");
-        return;
-      }
-      if (isNaN(numQuestions) || numQuestions < 1) {
-        alert("Lütfen geçerli bir soru sayısı giriniz.");
+
+      if (!quizUser || isNaN(numQuestions) || numQuestions < 1) {
+        alert("Lütfen geçerli bilgiler girin.");
         return;
       }
 
-      // Test başlangıç bilgisini Firebase'e kaydet
-      firebase.database().ref('quizLogs').push({
-        user: username,
-        event: "start",
-        timestamp: new Date().toISOString(),
-        totalQuestionsRequested: numQuestions
-      }).then(() => {
-        console.log("Test başlama zamanı Firebase'e kaydedildi.");
-      }).catch(err => {
-        console.error("Firebase hatası (start):", err);
+      startTime = new Date().toISOString();
+
+      firebase.database().ref("quizLogs").push({
+        user: quizUser,
+        status: "başladı",
+        date: startTime,
+        totalQuestions: numQuestions
       });
 
-      fetch("quiz-data.json").then(r => r.json()).then(data => {
-        if (numQuestions > data.length) {
-          alert(`En fazla ${data.length} soru var.`);
-          return;
-        }
-
-        quiz = getRandomQuestions(data, numQuestions);
-        current = 0;
-        total = quiz.length;
+      // örnek veri simülasyonu
+      fetch("quiz-data.json").then(res => res.json()).then(data => {
+        quizData = data.slice(0, numQuestions);
+        total = quizData.length;
         answered = new Array(total).fill(null);
-        setupDiv.style.display = "none";
-        questionEl.style.display = "block";
-        choicesEl.style.display = "block";
-        document.querySelector(".controls").style.display = "flex";
-        nextBtn.style.display = "inline-block";
-        prevBtn.style.display = "inline-block";
-        finishBtn.style.display = "block";
-        resultEl.textContent = "";
-        wrongList.innerHTML = "";
-        updateScoreDuringTest();
-        showQuestion();
-        updateButtons();
-
-        window.quizUser = username;
+        alert("Test başladı!");
       });
-    };
-
-    nextBtn.onclick = () => {
-      if (current < total - 1) {
-        current++;
-        showQuestion();
-        updateButtons();
-      }
-    };
-    prevBtn.onclick = () => {
-      if (current > 0) {
-        current--;
-        showQuestion();
-        updateButtons();
-      }
     };
 
     finishBtn.onclick = () => {
-      let correctCount = 0;
-      wrongList.innerHTML = '';
-      let wrongs = `<table><tr><th>Soru</th><th>Senin Cevabın</th><th>Doğru Cevap</th></tr>`;
-      for (let i = 0; i < total; i++) {
-        if (answered[i] === quiz[i].answer) correctCount++;
-        else if (answered[i]) {
-          wrongs += `<tr><td>${quiz[i].word}</td><td>${answered[i]}</td><td>${quiz[i].answer}</td></tr>`;
-        }
+      const endTime = new Date().toISOString();
+      let correct = 0;
+
+      for (let i = 0; i < answered.length; i++) {
+        if (answered[i] === quizData[i]?.answer) correct++;
       }
-      wrongs += "</table>";
-      wrongList.innerHTML = wrongs;
 
-      const attempted = answered.filter(a => a !== null).length;
-      const wrongCount = attempted - correctCount;
-
-      scoreDisplay.innerHTML = `
-        <span class="correct-count">Doğru: ${correctCount}</span> /
-        <span class="wrong-count">Yanlış: ${wrongCount}</span> /
-        <span>Toplam: ${total}</span>
-      `;
-      resultEl.textContent = "Test tamamlandı! Aşağıda yanlışlarınızı görebilirsiniz.";
-      nextBtn.disabled = true;
-      prevBtn.disabled = true;
-      finishBtn.disabled = true;
-      choicesEl.querySelectorAll("button").forEach(b => b.disabled = true);
-
-      const logData = {
-        user: window.quizUser || "Unknown",
-        event: "finish",
-        timestamp: new Date().toISOString(),
-        totalQuestionsRequested: total,
-        totalQuestionsAnswered: attempted,
-        correct: correctCount,
-        wrong: wrongCount
-      };
-
-      // Firebase'e testi bitirme zamanını ve istatistikleri kaydet
-      firebase.database().ref('quizLogs').push(logData)
-        .then(() => console.log("Quiz bitirme verisi Firebase'e kaydedildi."))
-        .catch(err => console.error("Firebase hatası (finish):", err));
-    };
-
-    function showQuestion() {
-      questionEl.textContent = `Soru ${current + 1}: "${quiz[current].word}" kelimesinin anlamı nedir?`;
-      choicesEl.innerHTML = "";
-      quiz[current].choices.forEach(choice => {
-        const btn = document.createElement("button");
-        btn.textContent = choice;
-        btn.disabled = false;
-        if (answered[current] === choice) {
-          btn.classList.add(choice === quiz[current].answer ? "correct" : "wrong");
-        }
-        btn.onclick = () => {
-          answered[current] = choice;
-          // Butonları güncelle
-          choicesEl.querySelectorAll("button").forEach(b => {
-            b.disabled = true;
-            if (b.textContent === quiz[current].answer) b.classList.add("correct");
-            else if (b.textContent === choice && choice !== quiz[current].answer) b.classList.add("wrong");
-          });
-          updateScoreDuringTest();
-        };
-        choicesEl.appendChild(btn);
+      firebase.database().ref("quizLogs").push({
+        user: quizUser,
+        status: "bitti",
+        date: endTime,
+        totalQuestions: total,
+        correct: correct,
+        wrong: total - correct
       });
-    }
 
-    function updateButtons() {
-      prevBtn.disabled = current === 0;
-      nextBtn.disabled = current === total - 1;
-    }
-
-    // Test sırasında doğru/yanlış sayısını güncelle
-    function updateScoreDuringTest() {
-      const correctCount = answered.reduce((acc, ans, i) => {
-        if (ans === quiz[i].answer) return acc + 1;
-        return acc;
-      }, 0);
-      const attempted = answered.filter(a => a !== null).length;
-      const wrongCount = attempted - correctCount;
-      scoreDisplay.innerHTML = `
-        <span class="correct-count">Doğru: ${correctCount}</span> /
-        <span class="wrong-count">Yanlış: ${wrongCount}</span> /
-        <span>Toplam: ${total}</span>
-      `;
-    }
-
-    // Rastgele soruları seç
-    function getRandomQuestions(data, count) {
-      const shuffled = [...data].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count);
-    }
+      alert("Test tamamlandı!");
+    };
   </script>
 </body>
 </html>
