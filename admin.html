@@ -33,6 +33,19 @@
     tbody tr:hover {
       background-color: #f1f1f1;
     }
+    button.deleteBtn {
+      background-color: #e53935;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    button.deleteBtn:hover {
+      background-color: #b71c1c;
+    }
   </style>
 </head>
 <body>
@@ -46,6 +59,7 @@
         <th>Soru Sayısı</th>
         <th>Doğru</th>
         <th>Yanlış</th>
+        <th>İşlem</th>
       </tr>
     </thead>
     <tbody id="logTableBody">
@@ -68,11 +82,23 @@
       databaseURL: "https://vocabularyapp-239c0-default-rtdb.europe-west1.firebasedatabase.app/"
     };
     firebase.initializeApp(firebaseConfig);
-    
+
     const tableBody = document.getElementById("logTableBody");
+
+    // Firebase'den verileri çek ve tarihe göre azalan şekilde sırala
     firebase.database().ref("quizLogs").once("value", snapshot => {
+      const entries = [];
       snapshot.forEach(child => {
         const data = child.val();
+        entries.push({ key: child.key, data });
+      });
+
+      // Tarihe göre azalan sırala
+      entries.sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
+
+      // Tabloya ekle
+      entries.forEach(entry => {
+        const { key, data } = entry;
         const row = document.createElement("tr");
 
         const formattedDate = new Date(data.date).toLocaleString("tr-TR");
@@ -83,7 +109,23 @@
           <td>${data.totalQuestions}</td>
           <td style="color:green">${data.correct}</td>
           <td style="color:red">${data.wrong}</td>
+          <td><button class="deleteBtn">Sil</button></td>
         `;
+
+        // Sil butonuna tıklayınca ilgili kaydı Firebase'den sil
+        row.querySelector(".deleteBtn").onclick = () => {
+          if (confirm("Bu kaydı silmek istediğinizden emin misiniz?")) {
+            firebase.database().ref("quizLogs").child(key).remove()
+              .then(() => {
+                alert("Kayıt başarıyla silindi.");
+                row.remove();
+              })
+              .catch(err => {
+                alert("Kayıt silinirken hata oluştu: " + err.message);
+              });
+          }
+        };
+
         tableBody.appendChild(row);
       });
     });
