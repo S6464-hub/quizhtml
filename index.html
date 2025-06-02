@@ -189,7 +189,7 @@
     <div id="wrongList"></div>
   </div>
 
-  <div id="signature">✨ Crafted with ❤️ by <span>Suat - 2025</span> ✨</div>
+  <div id="signature">✨ Crafted with by <span>Suat - 2025</span> ✨</div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -210,7 +210,7 @@
 
   <!-- Quiz Script -->
   <script>
-    let quiz = [], current = 0, score = 0, total = 0, answered = [];
+    let quiz = [], current = 0, total = 0, answered = [];
 
     const questionEl = document.getElementById("question");
     const choicesEl = document.getElementById("choices");
@@ -235,6 +235,18 @@
         return;
       }
 
+      // Test başlangıç bilgisini Firebase'e kaydet
+      firebase.database().ref('quizLogs').push({
+        user: username,
+        event: "start",
+        timestamp: new Date().toISOString(),
+        totalQuestionsRequested: numQuestions
+      }).then(() => {
+        console.log("Test başlama zamanı Firebase'e kaydedildi.");
+      }).catch(err => {
+        console.error("Firebase hatası (start):", err);
+      });
+
       fetch("quiz-data.json").then(r => r.json()).then(data => {
         if (numQuestions > data.length) {
           alert(`En fazla ${data.length} soru var.`);
@@ -254,11 +266,7 @@
         finishBtn.style.display = "block";
         resultEl.textContent = "";
         wrongList.innerHTML = "";
-        scoreDisplay.innerHTML = `
-          <span class="correct-count">Doğru: 0</span> /
-          <span class="wrong-count">Yanlış: 0</span> /
-          <span>Toplam: ${total}</span>
-        `;
+        updateScoreDuringTest();
         showQuestion();
         updateButtons();
 
@@ -266,8 +274,20 @@
       });
     };
 
-    nextBtn.onclick = () => { if (current < total - 1) { current++; showQuestion(); updateButtons(); } };
-    prevBtn.onclick = () => { if (current > 0) { current--; showQuestion(); updateButtons(); } };
+    nextBtn.onclick = () => {
+      if (current < total - 1) {
+        current++;
+        showQuestion();
+        updateButtons();
+      }
+    };
+    prevBtn.onclick = () => {
+      if (current > 0) {
+        current--;
+        showQuestion();
+        updateButtons();
+      }
+    };
 
     finishBtn.onclick = () => {
       let correctCount = 0;
@@ -281,9 +301,13 @@
       }
       wrongs += "</table>";
       wrongList.innerHTML = wrongs;
+
+      const attempted = answered.filter(a => a !== null).length;
+      const wrongCount = attempted - correctCount;
+
       scoreDisplay.innerHTML = `
         <span class="correct-count">Doğru: ${correctCount}</span> /
-        <span class="wrong-count">Yanlış: ${total - correctCount}</span> /
+        <span class="wrong-count">Yanlış: ${wrongCount}</span> /
         <span>Toplam: ${total}</span>
       `;
       resultEl.textContent = "Test tamamlandı! Aşağıda yanlışlarınızı görebilirsiniz.";
@@ -294,15 +318,18 @@
 
       const logData = {
         user: window.quizUser || "Unknown",
-        date: new Date().toISOString(),
-        totalQuestions: total,
+        event: "finish",
+        timestamp: new Date().toISOString(),
+        totalQuestionsRequested: total,
+        totalQuestionsAnswered: attempted,
         correct: correctCount,
-        wrong: total - correctCount
+        wrong: wrongCount
       };
 
+      // Firebase'e testi bitirme zamanını ve istatistikleri kaydet
       firebase.database().ref('quizLogs').push(logData)
-        .then(() => console.log("Quiz verisi Firebase'e kaydedildi."))
-        .catch(err => console.error("Firebase hatası:", err));
+        .then(() => console.log("Quiz bitirme verisi Firebase'e kaydedildi."))
+        .catch(err => console.error("Firebase hatası (finish):", err));
     };
 
     function showQuestion() {
@@ -311,44 +338,48 @@
       quiz[current].choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.textContent = choice;
+        btn.disabled = false;
+        if (answered[current] === choice) {
+          btn.classList.add(choice === quiz[current].answer ? "correct" : "wrong");
+        }
         btn.onclick = () => {
           answered[current] = choice;
-          showQuestion();
+          // Butonları güncelle
+          choicesEl.querySelectorAll("button").forEach(b => {
+            b.disabled = true;
+            if (b.textContent === quiz[current].answer) b.classList.add("correct");
+            else if (b.textContent === choice && choice !== quiz[current].answer) b.classList.add("wrong");
+          });
           updateScoreDuringTest();
         };
-        if (answered[current] !== null) {
-          if (choice === quiz[current].answer) btn.classList.add("correct");
-          if (choice === answered[current] && answered[current] !== quiz[current].answer) btn.classList.add("wrong");
-          btn.disabled = true;
-        }
         choicesEl.appendChild(btn);
       });
     }
 
     function updateButtons() {
-      prevBtn.disabled = (current === 0);
-      nextBtn.disabled = (current === total - 1);
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === total - 1;
     }
 
+    // Test sırasında doğru/yanlış sayısını güncelle
     function updateScoreDuringTest() {
-      let correct = 0, attempted = 0;
-      for (let i = 0; i < total; i++) {
-        if (answered[i] !== null) {
-          attempted++;
-          if (answered[i] === quiz[i].answer) correct++;
-        }
-      }
-      const wrong = attempted - correct;
+      const correctCount = answered.reduce((acc, ans, i) => {
+        if (ans === quiz[i].answer) return acc + 1;
+        return acc;
+      }, 0);
+      const attempted = answered.filter(a => a !== null).length;
+      const wrongCount = attempted - correctCount;
       scoreDisplay.innerHTML = `
-        <span class="correct-count">Doğru: ${correct}</span> /
-        <span class="wrong-count">Yanlış: ${wrong}</span> /
+        <span class="correct-count">Doğru: ${correctCount}</span> /
+        <span class="wrong-count">Yanlış: ${wrongCount}</span> /
         <span>Toplam: ${total}</span>
       `;
     }
 
-    function getRandomQuestions(arr, num) {
-      const shuffled = arr.slice().sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, num);
+    // Rastgele soruları seç
+    function getRandomQuestions(data, count) {
+      const shuffled = [...data].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
     }
   </script>
 </body>
