@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Logları - Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #1976d2;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px 15px;
+      text-align: center;
+    }
+    th {
+      background-color: #1976d2;
+      color: white;
+    }
+    tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 Quiz Log Kayıtları</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Kullanıcı</th>
+        <th>Tarih</th>
+        <th>Soru Sayısı</th>
+        <th>Doğru</th>
+        <th>Yanlış</th>
+      </tr>
+    </thead>
+    <tbody id="logTableBody">
+      <!-- Firebase verisi buraya eklenecek -->
+    </tbody>
+  </table>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDVhBgFfTtaiz5lzVF8rAyrrRPSfvQE89Y",
+      authDomain: "vocabularyapp-239c0.firebaseapp.com",
+      projectId: "vocabularyapp-239c0",
+      storageBucket: "vocabularyapp-239c0.appspot.com",
+      messagingSenderId: "126452247334",
+      appId: "1:126452247334:web:07ae3d8a1529b41e41afe7",
+      measurementId: "G-LXCFP7NPK9",
+      databaseURL: "https://vocabularyapp-239c0-default-rtdb.europe-west1.firebasedatabase.app/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    
+    const tableBody = document.getElementById("logTableBody");
+    firebase.database().ref("quizLogs").once("value", snapshot => {
+      snapshot.forEach(child => {
+        const data = child.val();
+        const row = document.createElement("tr");
+
+        const formattedDate = new Date(data.date).toLocaleString("tr-TR");
+
+        row.innerHTML = `
+          <td>${data.user || '-'}</td>
+          <td>${formattedDate}</td>
+          <td>${data.totalQuestions}</td>
+          <td style="color:green">${data.correct}</td>
+          <td style="color:red">${data.wrong}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    });
+  </script>
+</body>
+</html>
