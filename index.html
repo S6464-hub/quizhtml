@@ -191,6 +191,7 @@
 
   <div id="signature">✨ Crafted with by <span>Suat - 2025</span> ✨</div>
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
@@ -207,9 +208,9 @@
     firebase.initializeApp(firebaseConfig);
   </script>
 
+  <!-- Quiz Script -->
   <script>
     let quiz = [], current = 0, score = 0, total = 0, answered = [];
-    let currentQuizLogRef = null; // Firebase'deki mevcut sınav logunun referansı
 
     const questionEl = document.getElementById("question");
     const choicesEl = document.getElementById("choices");
@@ -262,20 +263,6 @@
         updateButtons();
 
         window.quizUser = username;
-
-        // *** Burası eklendi: Test başladığında log kaydı oluştur ***
-        const initialLogData = {
-          user: username,
-          startTime: new Date().toISOString(),
-          totalQuestions: total,
-          status: "started"
-        };
-
-        currentQuizLogRef = firebase.database().ref('quizLogs').push(initialLogData);
-        currentQuizLogRef
-          .then(() => console.log("Quiz başlangıç verisi Firebase'e kaydedildi."))
-          .catch(err => console.error("Firebase başlangıç hatası:", err));
-        // *** Ekleme sonu ***
       });
     };
 
@@ -305,22 +292,17 @@
       finishBtn.disabled = true;
       choicesEl.querySelectorAll("button").forEach(b => b.disabled = true);
 
-      // *** Burası güncellendi: Mevcut log kaydını güncelle ***
-      if (currentQuizLogRef) {
-        const updateData = {
-          endTime: new Date().toISOString(),
-          correct: correctCount,
-          wrong: total - correctCount,
-          status: "completed"
-        };
+      const logData = {
+        user: window.quizUser || "Unknown",
+        date: new Date().toISOString(),
+        totalQuestions: total,
+        correct: correctCount,
+        wrong: total - correctCount
+      };
 
-        currentQuizLogRef.update(updateData)
-          .then(() => console.log("Quiz bitiş verisi Firebase'e kaydedildi."))
-          .catch(err => console.error("Firebase bitiş hatası:", err));
-      } else {
-        console.warn("currentQuizLogRef tanımsız. Sınav başlangıcı kaydedilememiş olabilir.");
-      }
-      // *** Güncelleme sonu ***
+      firebase.database().ref('quizLogs').push(logData)
+        .then(() => console.log("Quiz verisi Firebase'e kaydedildi."))
+        .catch(err => console.error("Firebase hatası:", err));
     };
 
     function showQuestion() {
