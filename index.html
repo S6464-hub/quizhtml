@@ -56,8 +56,10 @@
     #startBtn:hover {
       background-color: #115293;
     }
-    .question, .choices, .controls {
-      display: none;
+    .question {
+      font-size: 21px;
+      margin-bottom: 14px;
+      font-weight: 600;
     }
     .choices button {
       display: block;
@@ -86,6 +88,7 @@
     }
     .controls {
       margin-top: 25px;
+      display: flex;
       justify-content: center;
       gap: 36px;
     }
@@ -102,19 +105,37 @@
     .controls button:hover {
       background-color: #115293;
     }
+    .controls button:disabled {
+      background-color: #a0a0a0;
+      cursor: not-allowed;
+    }
     #finishBtn {
       margin: 20px auto 0;
       display: block;
       max-width: 120px;
     }
-    #scoreDisplay, #result {
-      margin-top: 20px;
+    #scoreDisplay {
+      margin-top: 15px;
       font-weight: 700;
       text-align: center;
       font-size: 17px;
     }
+    .correct-count {
+      color: green;
+    }
+    .wrong-count {
+      color: red;
+    }
+    #result {
+      margin-top: 28px;
+      font-weight: 700;
+      font-size: 20px;
+      text-align: center;
+      color: #222;
+    }
     #wrongList {
       margin-top: 20px;
+      font-size: 16px;
     }
     #wrongList table {
       width: 100%;
@@ -127,6 +148,12 @@
     }
     #wrongList th {
       background-color: #f2f2f2;
+    }
+    #wrongList tr td:nth-child(2) {
+      color: red;
+    }
+    #wrongList tr td:nth-child(3) {
+      color: green;
     }
     #signature {
       text-align: center;
@@ -146,24 +173,23 @@
     <div id="setup">
       <label for="username">İsminiz:</label>
       <input type="text" id="username" placeholder="Adınızı girin" required />
-      <label for="numQuestions">Kaç soru çözmek istersiniz?</label>
+      <label for="numQuestions">Kaç soru çözmek istersin?</label>
       <input type="number" id="numQuestions" min="1" max="100" value="10" />
       <button id="startBtn">Teste Başla</button>
     </div>
-
-    <div id="question" class="question"></div>
-    <div id="choices" class="choices"></div>
-    <div class="controls">
+    <div id="question" class="question" style="display:none;"></div>
+    <div id="choices" class="choices" style="display:none;"></div>
+    <div class="controls" style="display:none;">
       <button id="prevBtn">Geri</button>
       <button id="nextBtn">İleri</button>
     </div>
-    <button id="finishBtn">Bitir</button>
+    <button id="finishBtn" style="display:none;">Bitir</button>
     <div id="scoreDisplay"></div>
     <div id="result"></div>
     <div id="wrongList"></div>
   </div>
 
-  <div id="signature">✨ Crafted with  by <span>Suat - 2025</span> ✨</div>
+  <div id="signature">✨ Crafted with ❤️ by <span>Suat - 2025</span> ✨</div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -172,63 +198,78 @@
     const firebaseConfig = {
       apiKey: "AIzaSyDVhBgFfTtaiz5lzVF8rAyrrRPSfvQE89Y",
       authDomain: "vocabularyapp-239c0.firebaseapp.com",
-      databaseURL: "https://vocabularyapp-239c0-default-rtdb.europe-west1.firebasedatabase.app/",
       projectId: "vocabularyapp-239c0",
       storageBucket: "vocabularyapp-239c0.appspot.com",
       messagingSenderId: "126452247334",
       appId: "1:126452247334:web:07ae3d8a1529b41e41afe7",
+      measurementId: "G-LXCFP7NPK9",
+      databaseURL: "https://vocabularyapp-239c0-default-rtdb.europe-west1.firebasedatabase.app/"
     };
     firebase.initializeApp(firebaseConfig);
+  </script>
 
-    let quiz = [], current = 0, score = 0, total = 0, answered = [];
-    const startBtn = document.getElementById("startBtn");
+  <!-- Quiz Script -->
+  <script>
+    let quiz = [], current = 0, total = 0, answered = [];
+
     const questionEl = document.getElementById("question");
     const choicesEl = document.getElementById("choices");
+    const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
     const prevBtn = document.getElementById("prevBtn");
     const finishBtn = document.getElementById("finishBtn");
-    const setupDiv = document.getElementById("setup");
-    const scoreDisplay = document.getElementById("scoreDisplay");
     const resultEl = document.getElementById("result");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const setupDiv = document.getElementById("setup");
     const wrongList = document.getElementById("wrongList");
 
     startBtn.onclick = () => {
       const username = document.getElementById("username").value.trim();
       const numQuestions = parseInt(document.getElementById("numQuestions").value);
-
-      if (!username || isNaN(numQuestions) || numQuestions < 1) {
-        alert("Lütfen geçerli bir isim ve soru sayısı giriniz.");
+      if (!username) {
+        alert("Lütfen isminizi giriniz.");
+        return;
+      }
+      if (isNaN(numQuestions) || numQuestions < 1) {
+        alert("Lütfen geçerli bir soru sayısı giriniz.");
         return;
       }
 
       fetch("quiz-data.json").then(r => r.json()).then(data => {
         if (numQuestions > data.length) {
-          alert(`En fazla ${data.length} soru çözebilirsiniz.`);
+          alert(`En fazla ${data.length} soru var.`);
           return;
         }
 
-        // Log only test started
-        firebase.database().ref("quizLogs").push({
-          user: username,
-          startedAt: new Date().toISOString(),
-          status: "started",
-          totalQuestions: numQuestions
-        });
-
-        quiz = data.sort(() => 0.5 - Math.random()).slice(0, numQuestions);
+        quiz = getRandomQuestions(data, numQuestions);
+        current = 0;
         total = quiz.length;
         answered = new Array(total).fill(null);
-        current = 0;
+        setupDiv.style.display = "none";
+        questionEl.style.display = "block";
+        choicesEl.style.display = "block";
+        document.querySelector(".controls").style.display = "flex";
+        nextBtn.style.display = "inline-block";
+        prevBtn.style.display = "inline-block";
+        finishBtn.style.display = "block";
+        resultEl.textContent = "";
+        wrongList.innerHTML = "";
+        updateScoreDuringTest();
+        showQuestion();
+        updateButtons();
+
         window.quizUser = username;
 
-        setupDiv.style.display = "none";
-        document.querySelector(".question").style.display = "block";
-        document.querySelector(".choices").style.display = "block";
-        document.querySelector(".controls").style.display = "flex";
-        finishBtn.style.display = "block";
-
-        showQuestion();
-        updateScore();
+        // Test başladı logu
+        const startLog = {
+          user: username,
+          date: new Date().toISOString(),
+          event: "started",
+          totalQuestions: total
+        };
+        firebase.database().ref('quizLogs').push(startLog)
+          .then(() => console.log("Test başladı logu Firebase'e kaydedildi."))
+          .catch(err => console.error("Firebase hatası:", err));
       });
     };
 
@@ -236,79 +277,108 @@
       if (current < total - 1) {
         current++;
         showQuestion();
+        updateButtons();
       }
     };
     prevBtn.onclick = () => {
       if (current > 0) {
         current--;
         showQuestion();
+        updateButtons();
       }
     };
 
     finishBtn.onclick = () => {
-      let correct = 0;
-      let wrongHTML = "<table><tr><th>Soru</th><th>Senin Cevabın</th><th>Doğru</th></tr>";
-
-      for (let i = 0; i < total; i++) {
-        if (answered[i] === quiz[i].answer) correct++;
-        else if (answered[i])
-          wrongHTML += `<tr><td>${quiz[i].word}</td><td>${answered[i]}</td><td>${quiz[i].answer}</td></tr>`;
+      const answeredCount = answered.filter(a => a !== null).length;
+      if (answeredCount < total) {
+        alert(`Tüm soruları çözmeden testi bitirebilirsiniz, ancak tüm soruları çözdüğünüzde "Bitir" butonuna basınız.`);
       }
 
-      wrongHTML += "</table>";
-      wrongList.innerHTML = wrongHTML;
+      // Testi bitirirken sonuçları kaydet
+      let correctCount = 0;
+      wrongList.innerHTML = '';
+      let wrongs = `<table><tr><th>Soru</th><th>Senin Cevabın</th><th>Doğru Cevap</th></tr>`;
+      for (let i = 0; i < total; i++) {
+        if (answered[i] === quiz[i].answer) correctCount++;
+        else if (answered[i]) {
+          wrongs += `<tr><td>${quiz[i].word}</td><td>${answered[i]}</td><td>${quiz[i].answer}</td></tr>`;
+        }
+      }
+      wrongs += "</table>";
 
-      scoreDisplay.innerHTML = `
-        <span class="correct-count">Doğru: ${correct}</span> /
-        <span class="wrong-count">Yanlış: ${total - correct}</span> /
-        <span>Toplam: ${total}</span>
-      `;
-      resultEl.textContent = "Test tamamlandı.";
+      const resultText = `Test tamamlandı! Doğru: <span class="correct-count">${correctCount}</span>, Yanlış: <span class="wrong-count">${total - correctCount}</span>.`;
+      resultEl.innerHTML = resultText;
+      wrongList.innerHTML = (correctCount === total) ? "" : wrongs;
 
-      // Log completed test
-      firebase.database().ref("quizLogs").push({
+      // Skoru göster
+      scoreDisplay.textContent = `Doğru: ${correctCount} / ${total}`;
+
+      // Logu Firebase'e kaydet
+      const logData = {
         user: window.quizUser,
-        finishedAt: new Date().toISOString(),
-        correct,
-        wrong: total - correct,
+        date: new Date().toISOString(),
+        event: "finished",
         totalQuestions: total,
-        status: "completed"
-      });
+        correct: correctCount,
+        wrong: total - correctCount,
+        answers: answered
+      };
+      firebase.database().ref('quizLogs').push(logData)
+        .then(() => console.log("Test bitirildi logu Firebase'e kaydedildi."))
+        .catch(err => console.error("Firebase hatası:", err));
 
+      // Butonları ve seçimleri kilitle
+      disableAllChoices();
       finishBtn.disabled = true;
       nextBtn.disabled = true;
       prevBtn.disabled = true;
-      choicesEl.querySelectorAll("button").forEach(b => b.disabled = true);
     };
 
+    function getRandomQuestions(data, count) {
+      const shuffled = data.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
     function showQuestion() {
-      questionEl.textContent = `Soru ${current + 1}: "${quiz[current].word}" kelimesinin anlamı nedir?`;
+      questionEl.textContent = `Soru ${current + 1}: ${quiz[current].word}`;
       choicesEl.innerHTML = "";
       quiz[current].choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.textContent = choice;
-        btn.onclick = () => {
-          answered[current] = choice;
-          showQuestion();
-          updateScore();
-        };
+        btn.disabled = finishBtn.disabled; // testi bitirdiyse seçimler kilitli
         if (answered[current] !== null) {
           if (choice === quiz[current].answer) btn.classList.add("correct");
           if (choice === answered[current] && answered[current] !== quiz[current].answer) btn.classList.add("wrong");
-          btn.disabled = true;
+          if (finishBtn.disabled && choice !== quiz[current].answer && choice !== answered[current]) {
+            btn.style.opacity = "0.7";
+          }
         }
+        btn.onclick = () => {
+          if (finishBtn.disabled) return;
+          answered[current] = choice;
+          updateScoreDuringTest();
+          showQuestion(); // Renkleri güncellemek için
+        };
         choicesEl.appendChild(btn);
       });
     }
 
-    function updateScore() {
-      const correct = answered.filter((ans, i) => ans === quiz[i].answer).length;
-      const wrong = answered.filter((ans, i) => ans !== null && ans !== quiz[i].answer).length;
-      scoreDisplay.innerHTML = `
-        <span class="correct-count">Doğru: ${correct}</span> /
-        <span class="wrong-count">Yanlış: ${wrong}</span> /
-        <span>Toplam: ${total}</span>
-      `;
+    function updateButtons() {
+      prevBtn.disabled = (current === 0);
+      nextBtn.disabled = (current === total - 1);
+    }
+
+    function updateScoreDuringTest() {
+      let correctCount = 0;
+      answered.forEach((ans, i) => {
+        if (ans === quiz[i].answer) correctCount++;
+      });
+      scoreDisplay.textContent = `Doğru: ${correctCount} / ${total}`;
+    }
+
+    function disableAllChoices() {
+      const buttons = choicesEl.querySelectorAll("button");
+      buttons.forEach(b => b.disabled = true);
     }
   </script>
 </body>
