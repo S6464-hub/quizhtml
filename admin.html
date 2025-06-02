@@ -7,8 +7,8 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
       padding: 30px;
+      background: #f9f9f9;
     }
     h1 {
       text-align: center;
@@ -18,31 +18,23 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 25px;
-      background-color: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: white;
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 10px 15px;
+      padding: 8px;
       text-align: center;
     }
     th {
       background-color: #1976d2;
       color: white;
     }
-    tbody tr:hover {
-      background-color: #f1f1f1;
-    }
-    button.deleteBtn {
-      background-color: #d32f2f;
+    .delete-btn {
+      background: red;
       color: white;
       border: none;
-      border-radius: 4px;
-      padding: 5px 12px;
+      padding: 4px 8px;
       cursor: pointer;
-    }
-    button.deleteBtn:hover {
-      background-color: #9a0007;
     }
   </style>
 </head>
@@ -53,16 +45,15 @@
     <thead>
       <tr>
         <th>Kullanıcı</th>
+        <th>Durum</th>
         <th>Tarih</th>
-        <th>Soru Sayısı</th>
+        <th>Soru</th>
         <th>Doğru</th>
         <th>Yanlış</th>
-        <th>İşlem</th>
+        <th>Sil</th>
       </tr>
     </thead>
-    <tbody id="logTableBody">
-      <!-- Firebase verisi buraya eklenecek -->
-    </tbody>
+    <tbody id="logTableBody"></tbody>
   </table>
 
   <!-- Firebase SDK -->
@@ -83,58 +74,36 @@
 
     const tableBody = document.getElementById("logTableBody");
 
-    // Verileri çek ve tarihe göre sırala (en yenisi en üstte)
-    firebase.database().ref("quizLogs").once("value", snapshot => {
-      let entries = [];
+    firebase.database().ref("quizLogs").orderByChild("date").once("value", snapshot => {
+      const logs = [];
       snapshot.forEach(child => {
-        entries.push({ key: child.key, data: child.val() });
+        logs.push({ id: child.key, ...child.val() });
       });
+      logs.reverse().forEach(data => {
+        const tr = document.createElement("tr");
+        const date = new Date(data.date).toLocaleString("tr-TR");
 
-      // Tarihe göre azalan sırala
-      entries.sort((a, b) => {
-        let dateA = new Date(a.data.date);
-        let dateB = new Date(b.data.date);
-        return dateB - dateA;
-      });
-
-      entries.forEach(entry => {
-        const { key, data } = entry;
-        const row = document.createElement("tr");
-
-        let dateObj = new Date(data.date);
-        if (isNaN(dateObj)) {
-          dateObj = null;
-        }
-        const formattedDate = dateObj ? dateObj.toLocaleString("tr-TR") : "-";
-
-        row.innerHTML = `
-          <td>${data.user || '-'}</td>
-          <td>${formattedDate}</td>
-          <td>${data.totalQuestions ?? '-'}</td>
-          <td style="color:green">${data.correct ?? 0}</td>
-          <td style="color:red">${data.wrong ?? 0}</td>
-          <td><button class="deleteBtn" data-key="${key}">Sil</button></td>
+        tr.innerHTML = `
+          <td>${data.user || "-"}</td>
+          <td>${data.status || "bitti"}</td>
+          <td>${date}</td>
+          <td>${data.totalQuestions || "-"}</td>
+          <td style="color:green">${data.correct ?? "-"}</td>
+          <td style="color:red">${data.wrong ?? "-"}</td>
+          <td><button class="delete-btn" onclick="deleteLog('${data.id}')">Sil</button></td>
         `;
-        tableBody.appendChild(row);
-      });
-
-      // Silme butonları için event listener
-      tableBody.querySelectorAll("button.deleteBtn").forEach(button => {
-        button.addEventListener("click", e => {
-          const key = e.target.getAttribute("data-key");
-          if (confirm("Bu kaydı silmek istediğinize emin misiniz?")) {
-            firebase.database().ref("quizLogs/" + key).remove()
-              .then(() => {
-                alert("Kayıt başarıyla silindi.");
-                location.reload();
-              })
-              .catch(err => {
-                alert("Silme sırasında hata oluştu: " + err.message);
-              });
-          }
-        });
+        tableBody.appendChild(tr);
       });
     });
+
+    function deleteLog(id) {
+      if (confirm("Bu kaydı silmek istediğinize emin misiniz?")) {
+        firebase.database().ref("quizLogs").child(id).remove().then(() => {
+          alert("Kayıt silindi!");
+          location.reload();
+        });
+      }
+    }
   </script>
 </body>
 </html>
